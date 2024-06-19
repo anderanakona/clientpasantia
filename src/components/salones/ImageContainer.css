@@ -1,0 +1,43 @@
+/* ImageWithButtons.css */
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.image {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.etiqueta {
+    position: absolute;
+    padding: 1.2% 1.2%;
+    background-color:transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transform: translate(-50%, -50%); /* Para centrar los botones en su posición */
+}
+
+.etiquetapeque {
+    position: absolute;
+    padding: 0.1% 0.1%;
+    background-color:transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transform: translate(-50%, -50%); /* Para centrar los botones en su posición */
+}
+
+
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+
+.no-bullets {
+    list-style-type: none;
+    padding-left: 0;
+}
