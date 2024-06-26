@@ -29,7 +29,7 @@ import {
   CHeaderNav,
   CDropdown,
 } from '@coreui/react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 /* MENU react-contexify */
 import 'react-contexify/dist/ReactContexify.css'
@@ -40,6 +40,8 @@ import { typesSalones } from '../../actions/salonAction'
 const AppSalones = () => {
   const [dataList, setDataList] = useState([])
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   useEffect(() => {
     async function fetchData() {
       const data = await getAllSalon()
@@ -61,6 +63,8 @@ const AppSalones = () => {
       type: typesSalones.INFO_SALON,
       horarioSalonData: dataHorarioSalon.data.body,
     })
+    navigate('/salon/agregarhorario')
+
   }
   return (
     <>
