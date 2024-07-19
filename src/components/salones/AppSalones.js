@@ -34,13 +34,15 @@ import CIcon from '@coreui/icons-react'
 /* MENU react-contexify */
 import 'react-contexify/dist/ReactContexify.css'
 import { cilContrast, cilMoon, cilNotes, cilOptions, cilPlus, cilSun } from '@coreui/icons'
-import { getHorarioSalon } from '../../api/HorarioClasesService'
+import { getHorarioSalon, getHorarioSalonSabado } from '../../api/HorarioClasesService'
 import { typesSalones } from '../../actions/salonAction'
 
 const AppSalones = () => {
   const [dataList, setDataList] = useState([])
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [searchTerm, setSearchTerm] = useState('');
+
 
   useEffect(() => {
     async function fetchData() {
@@ -63,13 +65,41 @@ const AppSalones = () => {
       type: typesSalones.INFO_SALON,
       horarioSalonData: dataHorarioSalon.data.body,
     })
+
+    const dataHorarioSalonSabado = await getHorarioSalonSabado(codigo)
+
+    dispatch({
+      type: typesSalones.INFO_SALON_SABADO,
+      horarioSalonDataSabado: dataHorarioSalonSabado.data.body,
+    })
+
+    
     navigate('/salon/agregarhorario')
 
   }
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+ 
+
+   // Filtrar las asignaturas basadas en el término de búsqueda
+   const filteredSalon=  dataList.filter((asignatura) =>
+    asignatura.codigo_salon.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    asignatura.nombresalon.toLowerCase().includes(searchTerm.toLowerCase()) 
+  );
   return (
     <>
       <div className="mb-3">
         <h4 className="text-center">Aulas</h4>
+        {/* Campo de búsqueda */}
+        <input
+          type="text"
+          className="form-control mb-3"
+          placeholder="Buscar aula por codigo o nombre"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
         <CTable align="middle" className="mb-0 border" hover responsive>
           <CTableHead color="light">
             <CTableRow>
@@ -83,7 +113,7 @@ const AppSalones = () => {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {dataList.map((scheduleItem, index) => (
+            {filteredSalon.map((scheduleItem, index) => (
               <CTableRow key={index}>
                 <CTableDataCell>
                   {scheduleItem.hora_inicio}-{scheduleItem.hora_fin}{' '}

@@ -50,8 +50,14 @@ const Modals = React.lazy(() => import('./views/notifications/modals/Modals'))
 const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 const AppSalonPrimerPiso = React.lazy(() => import('../src/components/salones/AppSalonPrimerPiso'))
+const AppSalonSegundoPiso = React.lazy(() => import('../src/components/salones/AppSalonSegundoPiso'))
 const AppSalones = React.lazy(() => import('../src/components/salones/AppSalones'))
 const AppHorarioClases = React.lazy(() => import('../src/components/salones/AppHorarioClases'))
+const AppAsignatura = React.lazy(() => import('../src/components/salones/AppAsignatura'))
+const AppProfesor = React.lazy(() => import('../src/components/salones/AppProfesor'))
+const AppPersona = React.lazy(() => import('../src/components/salones/AppPersona'))
+const AppProgress = React.lazy(() => import('../src/components/salones/AppProgress'))
+
 
 
 
@@ -59,10 +65,16 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', element: Dashboard }, 
-  { path: '/primerpiso/', name: 'primerpiso', element: AppSalonPrimerPiso },
+  { path: '/dashboard', name: 'Dashboard', element: AppSalonPrimerPiso }, 
+  { path: '/primerpiso', name: 'primerpiso', element: AppSalonPrimerPiso },
+  { path: '/segundopiso', name: 'segundopiso', element: AppSalonSegundoPiso },
   { path: '/salon/', name: 'salon', element: AppSalones },
+  { path: '/asignaturas/', name: 'asignatura', element: AppAsignatura },
+  { path: '/personas/', name: 'personas', element: AppPersona },
+  { path: '/profesores/', name: 'profesores', element: AppProfesor },
   { path: '/salon/agregarhorario', name: 'horario', element: AppHorarioClases },
+  { path: '/AppProgress', name: 'horario', element: AppProgress },
+
 ]
 
 export default routes

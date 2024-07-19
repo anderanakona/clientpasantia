@@ -30,6 +30,14 @@
     transform: translate(-50%, -50%); /* Para centrar los botones en su posición */
 }
 
+.etiquetatoolpit {
+    position: absolute;
+    padding: 0.1% 0.1%;
+    border: none;
+    cursor: pointer;
+    transform: translate(-50%, -50%); /* Para centrar los botones en su posición */
+}
+
 
 
 .btn:hover {
@@ -41,3 +49,4 @@
     list-style-type: none;
     padding-left: 0;
 }
+

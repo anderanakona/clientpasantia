@@ -6,10 +6,12 @@
 
 const INFO_SALON = 'INFO_SALON'
 const HORARIO_SALON = 'HORARIO_SALON'
+const INFO_SALON_SABADO = 'INFO_SALON_SABADO'
 
 const typesSalones = {
   INFO_SALON,
   HORARIO_SALON,
+  INFO_SALON_SABADO
 }
 
 function InfoSalon(payload) {
@@ -18,5 +20,8 @@ function InfoSalon(payload) {
 function InfoHorarioSalon(payload) {
   return { type: HORARIO_SALON, payload } // modal:payload   // pendiente de agregar cuando se habilite typescript
 }
+function InfoHorarioSalonSabado(payload) {
+  return { type: INFO_SALON_SABADO, payload } // modal:payload   // pendiente de agregar cuando se habilite typescript
+}
 
-export { InfoSalon, InfoHorarioSalon, typesSalones }
+export { InfoSalon, InfoHorarioSalon,InfoHorarioSalonSabado, typesSalones }

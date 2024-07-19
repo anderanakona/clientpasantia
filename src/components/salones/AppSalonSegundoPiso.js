@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import ProgressBar from './ProgressBar'
-import exampleImage from '../../assets/images/sanjoseprimerpiso.jpg'
+import exampleImage from '../../assets/images/sanjosesegundopiso.jpg'
 import './ImageContainer.css' // Si tienes estilos específicos para este componente
 import { CAvatar, CBadge,CCardBody, CCard, CCardHeader, CCol, CRow } from '@coreui/react'
 import { ModalInfoSalones } from '../modals/ModalInfoSalones'
@@ -11,9 +11,10 @@ import { getSalon } from '../../api/SalonService'
 import { getHorarioSalon, getHorarioSalonSabado, obtenerHorarioParaColores } from '../../api/HorarioClasesService'
 
 
-const AppSalonPrimerPiso = () => {
+const AppSalonSegundoPiso = () => {
   const dispatch = useDispatch()
-  //esto para la barra de progreso
+
+  //para lo de la barra de progreso
   const [progress, setProgress] = useState(0)
   const myElementRef = useRef(null)
   const [ancho, setAncho] = useState(0)
@@ -27,11 +28,10 @@ const AppSalonPrimerPiso = () => {
         setAncho(width)
       }
     }
+
     // Llamar a la función al montar el componente
     obtenerAnchoComponente()
   }, [])
-
-
 
   const obtenerDetalleSalones = async (codigo) => {
     dispatch({
@@ -62,20 +62,24 @@ const AppSalonPrimerPiso = () => {
   const obtenerDiaDeHoy=()=> {
     // Crear un nuevo objeto de fecha para hoy
     var today = new Date();
+
     // Array con los nombres de los días de la semana en español
     var weekdays = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
+
     // Obtener el número del día de la semana (0-6)
     var dayOfWeek = today.getDay();
+
     // Obtener el nombre del día de la semana usando el array de weekdays
     var dayName = weekdays[dayOfWeek];
+
     return dayOfWeek;
 }
 
 const colocarBotonesVerde=()=>{
-  document.getElementById("SJ110").style.backgroundColor='green';
-  document.getElementById("SJ111").style.backgroundColor='green';
-  document.getElementById("SJ112").style.backgroundColor='green';
-  document.getElementById("SJ117").style.backgroundColor='green';
+  document.getElementById("SJ202").style.backgroundColor='green';
+  document.getElementById("SJ203").style.backgroundColor='green';
+  document.getElementById("SJ204").style.backgroundColor='green';
+  document.getElementById("SJ205").style.backgroundColor='green';
 
 }
 
@@ -86,19 +90,20 @@ const btn=async(porcentaje)=>{
   colocarBotonesVerde();
   const colores=await obtenerHorarioParaColores(porcentaje,obtenerDiaDeHoy());
  
-  if(buscarListaPorSalon(colores.data.body,'SJ110')){
-    document.getElementById("SJ110").style.backgroundColor='red';
+  if(buscarListaPorSalon(colores.data.body,'SJ202')){
+    document.getElementById("SJ202").style.backgroundColor='red';
   }
-  if(buscarListaPorSalon(colores.data.body,'SJ111')){
-    document.getElementById("SJ111").style.backgroundColor='red';
+  if(buscarListaPorSalon(colores.data.body,'SJ203')){
+    document.getElementById("SJ203").style.backgroundColor='red';
   }
-  if(buscarListaPorSalon(colores.data.body,'SJ112')){
-    document.getElementById("SJ112").style.backgroundColor='red';
+  if(buscarListaPorSalon(colores.data.body,'SJ204')){
+    document.getElementById("SJ204").style.backgroundColor='red';
   }
-  if(buscarListaPorSalon(colores.data.body,'SJ117')){
-    document.getElementById("SJ117").style.backgroundColor='red';
+  if(buscarListaPorSalon(colores.data.body,'SJ205')){
+    document.getElementById("SJ205").style.backgroundColor='red';
   }
 }
+
 
 
 //////*******todo de la barra de progreso */
@@ -113,7 +118,7 @@ const handleMouseMove = (event) => {
   //console.log('Mouse pasó por encima del componente porcentaje ' + clickedPercentage)
 }
 
-const handleClick = async(event) => {
+const handleClick =async (event) => {
   const clickedPositionX = event.clientX - event.target.offsetLeft // Posición del clic respecto al borde izquierdo de la barra
   //const fullWidth = event.target.offsetWidth; // Ancho total de la barra
 
@@ -163,6 +168,7 @@ const handleClick2 = async(event) => {
   )
 
   await btn(porcentaje)
+
 }
 
 const calcularHoraPorcentaje = () => {
@@ -246,7 +252,6 @@ const calcularPorcentajeTiempo = async (
   });
 };
 
-
 /***Termina todo lo de la barra de progreso */
 
   return (
@@ -255,110 +260,35 @@ const calcularPorcentajeTiempo = async (
         <img src={exampleImage} alt="Descripción de la imagen" className="image" />
         <div
           className="etiqueta"
-          title='Salón 110'
-          style={{ top: '25.5%', left: '19.3%',backgroundColor:'green', width: '75px', height: '35px' }}
-          onClick={() => obtenerDetalleSalones('SJ110')}
-          id='SJ110'
+          title='Salón 202'
+          style={{ top: '28.5%', left: '21.7%',backgroundColor:'green', width: '55px', height: '35px' }}
+          onClick={() => obtenerDetalleSalones('SJ202')}
+          id='SJ202'
+        ></div>
+        
+        <div
+          className="etiqueta"
+          title='Salón 203'
+          style={{ top: '28.5%', left: '30.7%',backgroundColor:'green', width: '45px', height: '35px' }}
+          onClick={() => obtenerDetalleSalones('SJ203')}
+          id='SJ203'
         ></div>
         <div
           className="etiqueta"
-          style={{ top: '34%', left: '12.6%' ,width: '29px', height: '65px',backgroundColor:'green',}}
-          onClick={() => obtenerDetalleSalones('SJ111')}
-          title='Salón 111'
-          id='SJ111'
+          title='Salón 204'
+          style={{ top: '28.5%', left: '36.7%',backgroundColor:'green', width: '45px', height: '35px' }}
+          onClick={() => obtenerDetalleSalones('SJ204')}
+          id='SJ204'
         ></div>
         <div
           className="etiqueta"
-          style={{ top: '40.5%', left: '12.3%',backgroundColor:'green',width: '27px', height: '27px' }}
-          onClick={() => obtenerDetalleSalones('SJ112')}
-          title='Salón 112'
-          id='SJ112'
+          title='Salón 205'
+          style={{ top: '62.5%', left: '48.2%',backgroundColor:'green', width: '45px', height: '35px' }}
+          onClick={() => obtenerDetalleSalones('SJ205')}
+          id='SJ205'
         ></div>
-        <div
-          className="etiqueta"
-          style={{ top: '44.8%', left: '12.3%',backgroundColor:'green',width: '27px', height: '27px' }}
-          onClick={() => obtenerDetalleSalones('SJ117')}
-          title='Salón 117'
-          id='SJ117'
-        ></div>
-
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiquetapeque"
-          style={{ top: '50.8%', left: '20.3%', width: '25px', height: '25px',    borderRadius: '0', // Eliminamos el borde redondeado
-          }}
-        ></CAvatar>
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiquetapeque"
-          style={{ top: '50.8%', left: '27.3%', width: '25px', height: '25px' }}
-        ></CAvatar>
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiqueta"
-          style={{ top: '52%', left: '12.3%' }}
-        ></CAvatar>
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiqueta"
-          style={{ top: '58%', left: '12.1%' }}
-        ></CAvatar>
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiqueta"
-          style={{ top: '65%', left: '11.9%' }}
-        ></CAvatar>
-
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiqueta"
-          style={{ top: '71%', left: '11.9%' }}
-        ></CAvatar>
-
-        <CAvatar
-          title="calle 5"
-          color="primary"
-          textColor="white"
-          className="etiqueta"
-          style={{ top: '82%', left: '11.9%' }}
-        ></CAvatar>
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiqueta"
-          style={{ top: '82%', left: '18.5%' }}
-        ></CAvatar>
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiqueta"
-          style={{ top: '82%', left: '25%' }}
-        ></CAvatar>
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiqueta"
-          style={{ top: '82%', left: '29.2%', fontSize: '8px' }}
-        ></CAvatar>
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiquetapeque"
-          style={{ top: '82%', left: '32.2%', width: '25px', height: '25px' }}
-        ></CAvatar>
-
-        <CAvatar
-          color="primary"
-          textColor="white"
-          className="etiquetapeque"
-          style={{ top: '82%', left: '35.5%', width: '25px', height: '25px' }}
-        ></CAvatar>
+        
+        
       </div>
       <ModalInfoSalones></ModalInfoSalones>
 
@@ -560,11 +490,8 @@ const calcularPorcentajeTiempo = async (
         </div>
       </div>
 
-
-
-
     </>
   )
 }
 
-export default AppSalonPrimerPiso
+export default AppSalonSegundoPiso

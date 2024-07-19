@@ -31,7 +31,12 @@ const _nav = [
         component: CNavItem,
         name: 'primerpiso',
         to: '/primerpiso',
-      },      
+      },   
+      {
+        component: CNavItem,
+        name: 'segundopiso',
+        to: '/segundopiso',
+      },    
     ],
   },
   {
@@ -42,21 +47,26 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'Asignatura',
-        to: '/asignatura',
+        name: 'Asignaturas',
+        to: '/asignaturas',
       },
       {
         component: CNavItem,
         name: 'Salones',
         to: '/salon',
       },
+      {
+        component: CNavItem,
+        name: 'Profesores',
+        to: '/profesores',
+      },
+      {
+        component: CNavItem,
+        name: 'Personas',
+        to: '/personas',
+      },
       
     ],
-  },
-  {
-    component: CNavItem,
-    name: 'Cards',
-    to: '/base/cards',
   },
 ]
 
