@@ -34,3 +34,18 @@ export const getSalon = async (codigo) => {
     return false
   }
 }
+
+export const agregarSalon = async (salon) => {
+  try {
+    const { data } = await axios({
+      url: 'http://localhost:4000/api/salon/',
+      method: 'POST',
+      data: salon,
+    })
+    console.log(data)
+    return data
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+

@@ -57,6 +57,7 @@ const AppAsignatura = React.lazy(() => import('../src/components/salones/AppAsig
 const AppProfesor = React.lazy(() => import('../src/components/salones/AppProfesor'))
 const AppPersona = React.lazy(() => import('../src/components/salones/AppPersona'))
 const AppProgress = React.lazy(() => import('../src/components/salones/AppProgress'))
+const AppUsuario = React.lazy(() => import('../src/components/salones/AppUsuario'))
 
 
 
@@ -73,6 +74,7 @@ const routes = [
   { path: '/personas/', name: 'personas', element: AppPersona },
   { path: '/profesores/', name: 'profesores', element: AppProfesor },
   { path: '/salon/agregarhorario', name: 'horario', element: AppHorarioClases },
+  { path: '/personas/usuario', name: 'usuario', element: AppUsuario },
   { path: '/AppProgress', name: 'horario', element: AppProgress },
 
 ]

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getAllPersonas, createPersona, obtenerPersonaNumTipo } from '../../api/PersonaService'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 // Si tienes estilos específicos para este componente
 import './ImageContainer.css' // Si tienes estilos específicos para este componente
 /* COREUI */
@@ -29,7 +29,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 /* MENU react-contexify */
 import 'react-contexify/dist/ReactContexify.css'
-import { cilPencil, cilPlus, cilPuzzle } from '@coreui/icons'
+import { cilPencil, cilPlus, cilPuzzle, cilUser } from '@coreui/icons'
+import { typesPersona } from '../../actions/personaAction'
 
 const AppPersona = () => {
   const [listPersonas, setListPersonas] = useState([])
@@ -37,7 +38,7 @@ const AppPersona = () => {
   const [visible, setVisible] = useState(false)
 
   //formulario de personas
-  
+
   const [readOnlyTipoId, setReadOnlyTipoId] = useState(false)
   const [tipoId, setTipoId] = useState('CC')
   const [readOnlyNumId, setReadOnlyNumId] = useState(false)
@@ -46,6 +47,10 @@ const AppPersona = () => {
   const [apellidos, setApellidos] = useState('')
   const [estado, setEstado] = useState(0)
   const [tipoCrearModificar, setTipoCrearModificar] = useState('')
+
+  //
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function fetchData() {
@@ -90,7 +95,7 @@ const AppPersona = () => {
     }
   }
 
-  const guardar = async () => {
+  const guardar = async (event) => {
     if (tipoCrearModificar === 'crear') {
       const dataPersona = await obtenerPersonaNumTipo(numId, tipoId)
       if (dataPersona.data.body[0]) {
@@ -151,6 +156,18 @@ const AppPersona = () => {
         setListPersonas(nuevaLista)
       }
     }
+
+    event.preventDefault()
+  }
+
+  const obtenerPersona=(persona)=>{
+    console.log(persona)
+    dispatch({
+      type: typesPersona.INFO_PERSONA,
+      infoPersonaData: persona,
+    })
+    navigate('/personas/usuario')
+
   }
 
   return (
@@ -200,12 +217,22 @@ const AppPersona = () => {
                 <CTableDataCell>{scheduleItem.apellidos}</CTableDataCell>
                 <CTableDataCell>{scheduleItem.estado}</CTableDataCell>
                 <CTableDataCell>
+
                   <CIcon
                     icon={cilPencil}
                     className="text-primary"
+                    title="Editar"
                     style={{ cursor: 'pointer' }}
                     onClick={() => showModal('actualizar', scheduleItem)}
                   />
+                  <CIcon
+                    icon={cilUser}
+                    className="text-primary"
+                    title="Roles"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => obtenerPersona(scheduleItem)}
+                  />
+
                 </CTableDataCell>
               </CTableRow>
             ))}
@@ -220,9 +247,11 @@ const AppPersona = () => {
           aria-labelledby="ScrollingLongContentExampleLabel"
         >
           <CModalHeader>
-            <CModalTitle id="ScrollingLongContentExampleLabel">Guardar persona</CModalTitle>
+            <CModalTitle id="ScrollingLongContentExampleLabel">
+              {tipoCrearModificar === 'crear' ? 'Crear persona' : 'Actualizar persona'}
+            </CModalTitle>
           </CModalHeader>
-          <CForm autoComplete="off">
+          <CForm autoComplete="off" onSubmit={() => guardar()}>
             <CModalBody>
               <CRow className="mb-3">
                 <CCol sm={4}>
@@ -236,7 +265,8 @@ const AppPersona = () => {
                     className="form-control"
                     id="cod_tipo_id"
                     value={tipoId}
-                    disabled={readOnlyTipoId}                    
+                    disabled={readOnlyTipoId}
+                    required
                     onChange={(event) => setTipoId(event.target.value)}
                   >
                     <option value={'CC'}>Cedula de ciudadania</option>
@@ -257,6 +287,7 @@ const AppPersona = () => {
                     value={numId}
                     disabled={readOnlyNumId}
                     onChange={(event) => setNumId(event.target.value)}
+                    required
                   />
                 </CCol>
               </CRow>
@@ -272,6 +303,7 @@ const AppPersona = () => {
                     id="nombres"
                     value={nombres}
                     onChange={(event) => setNombres(event.target.value)}
+                    required
                   />
                 </CCol>
               </CRow>
@@ -287,6 +319,7 @@ const AppPersona = () => {
                     id="apellidos"
                     value={apellidos}
                     onChange={(event) => setApellidos(event.target.value)}
+                    required
                   />
                 </CCol>
               </CRow>
@@ -302,6 +335,7 @@ const AppPersona = () => {
                     id="cod_tipo_id"
                     value={estado}
                     onChange={(event) => setEstado(event.target.value)}
+                    required
                   >
                     <option value={1}>Activar</option>
                     <option value={0}>Inactivar</option>
@@ -311,10 +345,10 @@ const AppPersona = () => {
             </CModalBody>
             <CModalFooter>
               <CButton color="secondary" onClick={() => setVisible(false)}>
-                Close
+                Cerrar
               </CButton>
-              <CButton color="primary" onClick={() => guardar()}>
-                Guardar cambios
+              <CButton color="primary" type="submit">
+                {tipoCrearModificar === 'crear' ? 'Guardar' : ' Guardar cambios'}
               </CButton>
             </CModalFooter>
           </CForm>
