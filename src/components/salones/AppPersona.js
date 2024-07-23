@@ -31,6 +31,8 @@ import CIcon from '@coreui/icons-react'
 import 'react-contexify/dist/ReactContexify.css'
 import { cilPencil, cilPlus, cilPuzzle, cilUser } from '@coreui/icons'
 import { typesPersona } from '../../actions/personaAction'
+//para la alerta
+import Swal from 'sweetalert2'
 
 const AppPersona = () => {
   const [listPersonas, setListPersonas] = useState([])
@@ -96,10 +98,40 @@ const AppPersona = () => {
   }
 
   const guardar = async (event) => {
+    await Swal.fire({
+      title:
+      '¿Estás seguro de' + tipoCrearModificar === 'crear'
+        ? 'crear el registro?'
+        : 'guardar cambios?',
+      text: '¡No podrás revertir esto!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí,' + tipoCrearModificar === 'crear' ? 'crear' : 'guardar!',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await guardarPersona();
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: 'Cancelado',
+          text: 'No se realizo ninguna acción!',
+          icon: 'error',
+        })
+      }
+    })
+    event.preventDefault()
+  }
+
+  const guardarPersona = async (event) => {
     if (tipoCrearModificar === 'crear') {
       const dataPersona = await obtenerPersonaNumTipo(numId, tipoId)
       if (dataPersona.data.body[0]) {
-        alert('La persona ya existe no se puede crear')
+        Swal.fire({
+          title: 'Alerta',
+          text: 'La persona ya existe!',
+          icon: 'error',
+        })
       } else {
         const data = {
           cod_tipo_id: tipoId,
@@ -110,7 +142,11 @@ const AppPersona = () => {
         }
         const datainsert = await createPersona(data)
         if (datainsert) {
-          alert('Creado correctamente')
+          Swal.fire({
+            title: 'Creado!',
+            text: 'El registro ha sido creado.',
+            icon: 'success',
+          })
           setListPersonas([
             ...listPersonas,
             {
@@ -135,7 +171,11 @@ const AppPersona = () => {
         num_id: numId,
       })
       if (datainsert) {
-        alert('Actualizado correctamente')
+        Swal.fire({
+          title: 'Actualizado!',
+          text: 'El registro ha sido actualizado.',
+          icon: 'success',
+        })
         setVisible(!visible)
         const nuevaLista = listPersonas.map((objeto) => {
           if (objeto.num_id === numId && objeto.cod_tipo_id === tipoId) {
@@ -156,18 +196,15 @@ const AppPersona = () => {
         setListPersonas(nuevaLista)
       }
     }
-
-    event.preventDefault()
   }
 
-  const obtenerPersona=(persona)=>{
+  const obtenerPersona = (persona) => {
     console.log(persona)
     dispatch({
       type: typesPersona.INFO_PERSONA,
       infoPersonaData: persona,
     })
     navigate('/personas/usuario')
-
   }
 
   return (
@@ -217,22 +254,20 @@ const AppPersona = () => {
                 <CTableDataCell>{scheduleItem.apellidos}</CTableDataCell>
                 <CTableDataCell>{scheduleItem.estado}</CTableDataCell>
                 <CTableDataCell>
-
-                  <CIcon
-                    icon={cilPencil}
-                    className="text-primary"
-                    title="Editar"
-                    style={{ cursor: 'pointer' }}
+                  <button
+                    className="btn btn-primary"
+                    title="Agregar Horario"
                     onClick={() => showModal('actualizar', scheduleItem)}
-                  />
-                  <CIcon
-                    icon={cilUser}
-                    className="text-primary"
-                    title="Roles"
-                    style={{ cursor: 'pointer' }}
+                  >
+                    <CIcon icon={cilPencil} title="Editar" style={{ cursor: 'pointer' }} />
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    title="Agregar Horario"
                     onClick={() => obtenerPersona(scheduleItem)}
-                  />
-
+                  >
+                    <CIcon icon={cilUser} title="Roles" style={{ cursor: 'pointer' }} />
+                  </button>
                 </CTableDataCell>
               </CTableRow>
             ))}

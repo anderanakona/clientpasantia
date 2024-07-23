@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getAllSalon, getSalon } from '../../api/SalonService'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 // Si tienes estilos específicos para este componente
 import './ImageContainer.css' // Si tienes estilos específicos para este componente
 /* COREUI */
@@ -27,20 +26,35 @@ import {
 import CIcon from '@coreui/icons-react'
 /* MENU react-contexify */
 import { obtenerPersonaNumTipo } from '../../api/PersonaService'
-import { cilPlus } from '@coreui/icons'
-import { getAllRol } from '../../api/UsuarioService'
+import { cilPencil, cilPlus, cilTrash, cilUserX } from '@coreui/icons'
+import {
+  getAllRol,
+  buscarusuarioUnico,
+  agregarUsuario,
+  getAllRolIdPersona,
+  imprimirRol,
+  eliminarUsuario,
+} from '../../api/UsuarioService'
 import { useNavigate } from 'react-router-dom'
+//para la alerta
+import Swal from 'sweetalert2'
 
 const AppUsuario = () => {
   const [listRoles, setListRoles] = useState([])
   const [dataPersona, setDataPersona] = useState([])
+  const [listRolPersona, setListRolPersona] = useState([])
   const per = useSelector((state) => state.personaReducer.infoPersonaData)
   const navigate = useNavigate()
   const [visible, setVisible] = useState(false)
+  const [visibleContrasena, setVisibleContrasena] = useState(false)
   const [rolSelect, setRolSelect] = useState('')
-  const [constrasena, setContrasena] = useState('')
+  const [contrasena, setContrasena] = useState('')
   const [nombreUsuario, setNombreUsuario] = useState('')
+  const [nombreUsuarioAnt, setNombreUsuarioAnt] = useState('')
   const [email, setEmail] = useState('')
+  const [tipoCrearModificar, setTipoCrearModificar] = useState('')
+  const [readOnly, setReadOnly] = useState(false)
+  const [listTodosRoles, setListTodosRoles] = useState([])
 
   useEffect(() => {
     if (per.nombres === undefined) {
@@ -60,24 +74,234 @@ const AppUsuario = () => {
       if (dataRol) {
         setListRoles(dataRol.data.body)
       }
+
+      const dataRolPersona = await getAllRolIdPersona(dataPersona.id)
+      if (dataRolPersona) {
+        setListRolPersona(dataRolPersona.data.body)
+      }
+      const dataAllRol = await imprimirRol()
+      if (dataAllRol) {
+        setListTodosRoles(dataAllRol.data.body)
+      }
     }
   }, [setDataPersona, dataPersona]) // Solo se ejecuta cuando 'count' cambia
 
-  const showModalRol = (tipo, objeto)=> {
+  const showModalRol = async (tipo, objeto) => {
     setVisible(!visible)
-    if(tipo==='crear'){
-        vaciarFormulario()
+    if (tipo === 'crear') {
+      setTipoCrearModificar(tipo)
+      vaciarFormulario()
+      setReadOnly(false)
+      setNombreUsuarioAnt('')
+    } else {
+      setTipoCrearModificar(tipo)
+      setNombreUsuario(objeto.nombre_usuario)
+      setEmail(objeto.email)
+      setRolSelect(objeto.id_rol)
+      setReadOnly(true)
+      setNombreUsuarioAnt(objeto.nombre_usuario)
     }
   }
 
-  const seleccionarRol = (event) => {
+  const showModalContrasena = async (tipo, objeto) => {
+    setVisibleContrasena(!visibleContrasena)
+    if (tipo === 'actualizar') {
+      setTipoCrearModificar(tipo)
+      setNombreUsuario(objeto.nombre_usuario)
+    }
+  }
+
+  const seleccionarRol = async (event) => {
+    await Swal.fire({
+      title:
+        '¿Estás seguro de' + tipoCrearModificar === 'crear'
+          ? 'crear el registro?'
+          : 'guardar cambios?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí,' + tipoCrearModificar === 'crear' ? 'crear!' : 'guardar!',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await seleccionarRolMensaje()
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: 'Cancelado',
+          text: 'No se realizo ninguna acción:)',
+          icon: 'error',
+        })
+      }
+    })
     event.preventDefault()
   }
-  const vaciarFormulario=()=>{
+
+  const seleccionarRolMensaje = async (event) => {
+    if (tipoCrearModificar === 'crear') {
+      const dataNombreUsuario = await buscarusuarioUnico(nombreUsuario)
+      if (dataNombreUsuario.data.body) {
+        Swal.fire({
+          title: 'Upps',
+          text: 'El usuario ya existe',
+          icon: 'error',
+        })
+      } else {
+        const data = {
+          id_persona: dataPersona.id,
+          nombre_usuario: nombreUsuario,
+          email: email,
+          contrasena: contrasena,
+          id_rol: rolSelect,
+          rol: rolSelect,
+        }
+        const datainsert = await agregarUsuario(data)
+        if (datainsert) {
+          Swal.fire({
+            title: '¡Creado!',
+            text: 'El registro ha sido creado.',
+            icon: 'success',
+          })
+          setVisible(!visible)
+          await actualizarTablaRoles()
+        }
+      }
+    } else {
+      const dataNombreUsuario = await buscarusuarioUnico(nombreUsuarioAnt)
+      const data1 = {
+        id: dataNombreUsuario.data.body.id,
+        id_persona: dataPersona.id,
+        nombre_usuario: nombreUsuario,
+        email: email,
+        id_rol: rolSelect,
+        rol: rolSelect,
+      }
+      if (nombreUsuario != nombreUsuarioAnt) {
+        const dataNombreUsuario2 = await buscarusuarioUnico(nombreUsuario)
+        console.log(dataNombreUsuario2)
+        if (dataNombreUsuario2.data.body) {
+          Swal.fire({
+            title: 'Upps',
+            text: 'ya existe con otro nombre de usuario ',
+            icon: 'error',
+          })
+        } else {
+          const datainsert = await agregarUsuario(data1)
+          if (datainsert) {
+            Swal.fire({
+              title: '¡Creado!',
+              text: 'El registro ha sido creado.',
+              icon: 'success',
+            })
+            setVisible(!visible)
+            await actualizarTablaRoles()
+          }
+        }
+      } else {
+        const datainsert = await agregarUsuario(data1)
+        if (datainsert) {
+          Swal.fire({
+            title: '¡Actualizado!',
+            text: 'El registro ha sido actualizado.',
+            icon: 'success',
+          })
+          setVisible(!visible)
+          await actualizarTablaRoles()
+        }
+      }
+    }
+  }
+
+  const updateContrasena = async (event) => {
+    if (tipoCrearModificar === 'actualizar') {
+      const dataNombreUsuario = await buscarusuarioUnico(nombreUsuario)
+      const data1 = {
+        id: dataNombreUsuario.data.body.id,
+        contrasena: contrasena,
+      }
+      const datainsert = await agregarUsuario(data1)
+      if (datainsert) {
+        Swal.fire({
+          title: '¡Actualizado!',
+          text: 'Actualización de contraseña correcta',
+          icon: 'success',
+        })
+        setVisibleContrasena(!visibleContrasena)
+        await actualizarTablaRoles()
+      }
+    }
+  }
+
+  const guardarContrasena = async (event) => {
+    await Swal.fire({
+      title: '¿Estás seguro de guardar cambios?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, guardar!',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await updateContrasena()
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: 'Cancelado',
+          text: 'No se realizo ninguna acción:)',
+          icon: 'error',
+        })
+      }
+    })
+    event.preventDefault()
+  }
+
+  const vaciarFormulario = () => {
     setRolSelect('')
     setContrasena('')
     setNombreUsuario('')
     setEmail('')
+  }
+
+  // Función para eliminar un usuario
+  const actualizarTablaRoles = async () => {
+    const dataRol = await getAllRol(dataPersona.id)
+    if (dataRol) {
+      setListRoles(dataRol.data.body)
+    }
+    const dataR = await getAllRolIdPersona(dataPersona.id)
+    if (dataR) {
+      setListRolPersona(dataR.data.body)
+    }
+  }
+
+  // Función para eliminar un usuario
+  const eliminarRol = async (tipo, usuario) => {
+    await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¡No podrás revertir esto!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminarlo!',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const deleteRol = await eliminarUsuario(usuario)
+        if (deleteRol && deleteRol.status === 200) {
+          actualizarTablaRoles()
+        }
+
+        Swal.fire({
+          title: '¡Eliminado!',
+          text: 'El registro ha sido eliminado.',
+          icon: 'success',
+        })
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: 'Cancelado',
+          text: 'Tu archivo imaginario está seguro :)',
+          icon: 'error',
+        })
+      }
+    })
   }
 
   return (
@@ -87,20 +311,71 @@ const AppUsuario = () => {
           {dataPersona.nombres} {dataPersona.apellidos}
         </h4>
         <CRow>
-          <CCol sm={10}></CCol>
-          <CCol sm={1}>
+          <CCol sm={8}></CCol>
+          <CCol sm={2}>
             <CTooltip content="Agregar rol">
               <CIcon
                 icon={cilPlus}
                 className="text-primary"
                 style={{ cursor: 'pointer' }}
                 size="xl"
-                onClick={() => showModalRol("crear",null)}
+                onClick={() => showModalRol('crear', null)}
               />
             </CTooltip>
           </CCol>
-          <CCol sm={1}></CCol>
+          <CCol sm={2}></CCol>
         </CRow>
+        {}
+        {listRolPersona.length > 0 ? (
+          <>
+            <CTable align="middle" className="mb-0 border" hover responsive>
+              <CTableHead color="light">
+                <CTableRow>
+                  <CTableHeaderCell scope="col">Nombres usuario </CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Email</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Rol </CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Acciones </CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody>
+                {listRolPersona.map((scheduleItem, index) => (
+                  <CTableRow key={index}>
+                    <CTableDataCell>{scheduleItem.nombre_usuario}</CTableDataCell>
+                    <CTableDataCell>{scheduleItem.email}</CTableDataCell>
+                    <CTableDataCell>{scheduleItem.descripcion}</CTableDataCell>
+                    <CTableDataCell>
+                      <button
+                        className="btn btn-primary"
+                        title="Actualizar usuario"
+                        onClick={() => showModalRol('actualizar', scheduleItem)}
+                      >
+                        <CIcon icon={cilPencil} />
+                      </button>
+
+                      <button
+                        className="btn btn-danger"
+                        title="Eliminar usuario"
+                        onClick={() => eliminarRol('eliminar', scheduleItem)}
+                      >
+                        <CIcon icon={cilTrash} />
+                      </button>
+
+                      <button
+                        className="btn btn-success"
+                        title="Editar contraseña"
+                        onClick={() => showModalContrasena('actualizar', scheduleItem)}
+                      >
+                        <CIcon icon={cilUserX} />
+                      </button>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))}
+              </CTableBody>
+            </CTable>
+          </>
+        ) : (
+          ''
+        )}
       </div>
       <CModal
         visible={visible}
@@ -108,7 +383,10 @@ const AppUsuario = () => {
         aria-labelledby="ScrollingLongContentExampleLabel"
       >
         <CModalHeader>
-          <CModalTitle id="ScrollingLongContentExampleLabel">Agregar de rol</CModalTitle>
+          <CModalTitle id="ScrollingLongContentExampleLabel">
+            {tipoCrearModificar === 'crear' ? 'Agregar de rol a' : 'Actualizar'}
+            {dataPersona.nombres} {dataPersona.apellidos}
+          </CModalTitle>
         </CModalHeader>
         <CForm autoComplete="off" onSubmit={() => seleccionarRol()}>
           <CModalBody>
@@ -120,20 +398,37 @@ const AppUsuario = () => {
               </CCol>
 
               <CCol sm={8}>
-                <select
-                  className="form-control"
-                  id="rolid"
-                  required
-                  value={rolSelect}
-                  onChange={(event) => setRolSelect(event.target.value)}
-                >
-                  <option value={''}>Seleccionar rol</option>
-                  {listRoles.map((scheduleItem, index) => (
-                    <option key={index} value={scheduleItem.id}>
-                      {scheduleItem.descripcion}
-                    </option>
-                  ))}
-                </select>
+                {tipoCrearModificar === 'crear' ? (
+                  <select
+                    className="form-control"
+                    id="rolid"
+                    required
+                    value={rolSelect}
+                    onChange={(event) => setRolSelect(event.target.value)}
+                  >
+                    <option value={''}>Seleccionar rol</option>
+                    {listRoles.map((scheduleItem, index) => (
+                      <option key={index} value={scheduleItem.id}>
+                        {scheduleItem.descripcion}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <select
+                    className="form-control"
+                    id="rolid"
+                    required
+                    disabled={true}
+                    value={rolSelect}
+                    onChange={(event) => setRolSelect(event.target.value)}
+                  >
+                    {listTodosRoles.map((scheduleItem, index) => (
+                      <option key={index} value={scheduleItem.id}>
+                        {scheduleItem.descripcion}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </CCol>
             </CRow>
             <CRow className="mb-3">
@@ -170,6 +465,68 @@ const AppUsuario = () => {
                 />
               </CCol>
             </CRow>
+            {tipoCrearModificar === 'crear' ? (
+              <CRow className="mb-3">
+                <CCol sm={4}>
+                  <CFormLabel htmlFor="contrasena" className="col-sm-2 col-form-label">
+                    Contraseña{' '}
+                  </CFormLabel>
+                </CCol>
+
+                <CCol sm={8}>
+                  <input
+                    type="password"
+                    className="form-control"
+                    required
+                    id="contrasena"
+                    value={contrasena}
+                    onChange={(event) => setContrasena(event.target.value)}
+                  ></input>
+                </CCol>
+              </CRow>
+            ) : (
+              ''
+            )}
+          </CModalBody>
+          <CModalFooter>
+            <CButton color="secondary" onClick={() => setVisible(false)}>
+              Cancelar
+            </CButton>
+            <CButton color="primary" type="submit">
+              {tipoCrearModificar === 'crear' ? 'Guardar' : 'Guardar cambios'}
+            </CButton>
+          </CModalFooter>
+        </CForm>
+      </CModal>
+
+      <CModal
+        visible={visibleContrasena}
+        onClose={() => setVisibleContrasena(false)}
+        aria-labelledby="ScrollingLongContentExampleLabel"
+      >
+        <CModalHeader>
+          <CModalTitle id="ScrollingLongContentExampleLabel">{'Editar contraseña'}</CModalTitle>
+        </CModalHeader>
+        <CForm autoComplete="off" onSubmit={() => guardarContrasena()}>
+          <CModalBody>
+            <CRow className="mb-3">
+              <CCol sm={4}>
+                <CFormLabel htmlFor="nombre_usuario" className="col-sm-2 col-form-label">
+                  Nombre usuario
+                </CFormLabel>
+              </CCol>
+
+              <CCol sm={8}>
+                <CFormInput
+                  type="text"
+                  required
+                  id="nombre_usuario"
+                  disabled={true}
+                  value={nombreUsuario}
+                  onChange={(event) => setNombreUsuario(event.target.value)}
+                />
+              </CCol>
+            </CRow>
             <CRow className="mb-3">
               <CCol sm={4}>
                 <CFormLabel htmlFor="contrasena" className="col-sm-2 col-form-label">
@@ -178,22 +535,23 @@ const AppUsuario = () => {
               </CCol>
 
               <CCol sm={8}>
-                <CFormInput
+                <input
                   type="password"
+                  className="form-control"
                   required
                   id="contrasena"
-                  value={constrasena}
+                  value={contrasena}
                   onChange={(event) => setContrasena(event.target.value)}
-                />
+                ></input>
               </CCol>
             </CRow>
           </CModalBody>
           <CModalFooter>
-            <CButton color="secondary" onClick={() => setVisible(false)}>
+            <CButton color="secondary" onClick={() => setVisibleContrasena(false)}>
               Cancelar
             </CButton>
             <CButton color="primary" type="submit">
-              Agregar rol
+              {tipoCrearModificar === 'crear' ? 'Guardar' : 'Guardar cambios'}
             </CButton>
           </CModalFooter>
         </CForm>

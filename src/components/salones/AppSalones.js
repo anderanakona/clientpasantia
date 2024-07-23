@@ -39,6 +39,8 @@ import {
 } from '@coreui/icons'
 import { getHorarioSalon, getHorarioSalonSabado } from '../../api/HorarioClasesService'
 import { typesSalones } from '../../actions/salonAction'
+//para la alerta
+import Swal from 'sweetalert2'
 
 const AppSalones = () => {
   const [dataList, setDataList] = useState([])
@@ -110,10 +112,40 @@ const AppSalones = () => {
   }
 
   const guardar = async (event) => {
+    await Swal.fire({
+      title:
+      '¿Estás seguro de' + tipoCrearModificar === 'crear'
+        ? 'crear el registro?'
+        : 'guardar cambios?',
+      text: '¡No podrás revertir esto!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí,' + tipoCrearModificar === 'crear' ? 'crear' : 'guardar!',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await guardarSalon();
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: 'Cancelado',
+          text: 'No se realizo ninguna acción!',
+          icon: 'error',
+        })
+      }
+    })
+    event.preventDefault()
+  }
+
+  const guardarSalon = async (event) => {
     if (tipoCrearModificar === 'crear') {
       const dataSalon = await getSalon(codigoSalon)
       if (dataSalon.data.body[0]) {
-        alert('El salon ya existe con ese codigo')
+        Swal.fire({
+          title: 'Duplicidad',
+          text: 'El salon ya existe con ese codigo!',
+          icon: 'error',
+        })
       } else {
         const data = {
           codigo_salon: codigoSalon,
@@ -124,7 +156,11 @@ const AppSalones = () => {
         }
         const datainsert = await agregarSalon(data)
         if (datainsert) {
-          alert('Creado correctamente')
+          Swal.fire({
+            title: 'Cancelado',
+            text: 'Creado correctamente!',
+            icon: 'success',
+          })
           setDataList([...dataList, data])
           setVisible(!visible)
         }
@@ -142,7 +178,11 @@ const AppSalones = () => {
       const datainsert = await agregarSalon(data)
 
       if (datainsert) {
-        alert('Actualizado correctamente')
+        Swal.fire({
+          title: 'Actualizado',
+          text: 'Actualizado correctamente!',
+          icon: 'success',
+        })
         setVisible(!visible)
         const nuevaLista = dataList.map((objeto) => {
           if (objeto.codigo_salon === codigoSalon) {

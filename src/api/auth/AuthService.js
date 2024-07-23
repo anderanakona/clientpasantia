@@ -30,6 +30,6 @@ export const authLogin = async (nombre_usuario, contrasena, props) => {
     //return data
   } catch (error) {
     console.log(error.message);
-    alert("Request failed with status code 500");
+    alert("Usuario y/o contraseña incorrectas");
   }
 }
