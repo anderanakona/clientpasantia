@@ -1,4 +1,5 @@
 import React from 'react'
+import Cookies from 'universal-cookie'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -60,11 +61,15 @@ const AppProgress = React.lazy(() => import('../src/components/salones/AppProgre
 const AppUsuario = React.lazy(() => import('../src/components/salones/AppUsuario'))
 
 
-
+const cookies = new Cookies()
+  
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
-const routes = [
+let routes=[];
+
+
+routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: AppSalonPrimerPiso }, 
   { path: '/primerpiso', name: 'primerpiso', element: AppSalonPrimerPiso },

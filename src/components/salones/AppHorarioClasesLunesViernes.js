@@ -6,7 +6,8 @@ import { getAllProfesor } from '../../api/ProfesorService'
 import {
   createHorario,
   getHorarioSalon,
-  obtenerHorarioSalonId,obtenerHorarioDetalle
+  obtenerHorarioSalonId,obtenerHorarioDetalle,
+  eliminarHorarioBD
 } from '../../api/HorarioClasesService'
 /* COREUI */
 import {
@@ -29,10 +30,14 @@ import {
   CRow,
   CForm,
   CFormSelect,
+  CTooltip,
 } from '@coreui/react'
 
 /* REACTJS-REDUX */
 import { useDispatch, useSelector } from 'react-redux'
+import CIcon from '@coreui/icons-react'
+import { cilTrash } from '@coreui/icons'
+import Swal from 'sweetalert2'
 
 const AppHorarioClasesLunesViernes = () => {
   const dataHorario = useSelector((state) => state.salonReducer.horarioSalonData)
@@ -101,11 +106,11 @@ const AppHorarioClasesLunesViernes = () => {
     setVisible(false)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault()
     //console.log('Form Data Submitted:', formData)
-    guardarHorario()
-    setVisible(false)
+   await guardarHorario()
+   
   }
   // Función para actualizar un horario específico por su ID
   const actualizarHorario = (id) => {
@@ -181,35 +186,63 @@ const AppHorarioClasesLunesViernes = () => {
     return horaAMPM;
   }
 
-  const guardarHorario = async () => {
-    try {
-      const formulario = {
-        id: idHorario,
-        id_hora: idHora,
-        id_dia_semana: idDiaSemana,
-        asignatura: asignatura,
-        profesor: profesor,
-        id_salon: data.id,
-        id_asignatura: 0,
+  const guardarHorario = async () => { 
+
+    await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¡No podrás revertir esto!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, guardarlo!',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const formulario = {
+            id: idHorario,
+            id_hora: idHora,
+            id_dia_semana: idDiaSemana,
+            asignatura: asignatura,
+            profesor: profesor,
+            id_salon: data.id,
+            id_asignatura: 0,
+          }
+          const formu = await createHorario(formulario)
+          //console.log(formu)
+          if (formu.error===false) {
+            //setListHorario(dataHorarioSalon.data.body)
+            const obj = await obtenerHorarioSalonId(data.codigo_salon, idHora)
+            setHorario2(obj.data.body[0])
+            setListHorario(actualizarHorario(idHora))
+            setListHorario(actualizarHorario(idHora))
+            Swal.fire({
+              title: 'Cancelado',
+              text: 'Tu registro ha sido guardado correctamente :)',
+              icon: 'success',
+            })
+            setProfesor("")
+            setAsignatura("")
+          }
+        } catch (error) {
+          console.log(error)
+        }
+        setIdHorario(0)
+        setVisible(false)
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: 'Cancelado',
+          text: 'puedes seguir  editando :)',
+          icon: 'error',
+        })
       }
-      console.log(formulario)
-      const formu = await createHorario(formulario)
-      //console.log(formu)
-      if (formu != false) {
-        //setListHorario(dataHorarioSalon.data.body)
-        const obj = await obtenerHorarioSalonId(data.codigo_salon, idHora)
-        setHorario2(obj.data.body[0])        
-        setListHorario(actualizarHorario(idHora))
-        setListHorario(actualizarHorario(idHora))
-        alert('ingreso correctamente')
-        setProfesor("")
-        setAsignatura("")
-      }
-    } catch (error) {
-      console.log(error)
-    }
-    setIdHorario(0)
+    })
+
   }
+
+
+
+  
 
   const handleIdHoraChange = (event) => {
     setIdHora(event.target.value)
@@ -226,6 +259,108 @@ const AppHorarioClasesLunesViernes = () => {
   const handleProfesorChange = (event) => {
     setProfesor(event.target.value)
   }
+  
+  const eliminarHorario=async()=>{
+    await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¡No podrás revertir esto!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminarlo!',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const formulario = {
+            id: idHorario,
+            id_asignatura: 0,
+          }
+          const formu = await eliminarHorarioBD(formulario)
+          if (formu.error===false) {
+            //setListHorario(dataHorarioSalon.data.body)
+            const obj = await obtenerHorarioSalonId(data.codigo_salon, idHora)
+            setHorario2(obj.data.body[0])
+            setListHorario(eliminarHorarioTabla(idHora))
+            setListHorario(eliminarHorarioTabla(idHora))           
+            setProfesor("")
+            setAsignatura("")
+            Swal.fire({
+              title: '¡Eliminado!',
+              text: 'El registro ha sido eliminado.',
+              icon: 'success',
+            })
+          }
+        } catch (error) {
+          console.log(error)
+        }
+        setIdHorario(0)
+        setVisible(false)
+        
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: 'Cancelado',
+          text: 'Tu registro esta seguro :)',
+          icon: 'error',
+        })
+      }
+    })
+    
+  }
+
+  const eliminarHorarioTabla = (id) => {
+
+    // Creamos una copia del array original usando map para encontrar y actualizar el horario por su ID
+    const horariosActualizados = listHorario.map((horarioset) => {
+      if (horarioset.id === id) {
+        //console.log(obj.data.body[0])
+        // Modificamos solo el horario que coincide con el ID
+        if (dia === 'Lunes') {
+          return {
+            ...horarioset,
+            asignatura_lunes: '',
+            profesor_lunes: '',
+            id_horario_lunes: 0,
+          }
+        } else if (dia === 'Martes') {
+          return {
+            ...horarioset,
+            asignatura_martes: '',
+            profesor_martes: '',
+            id_horario_martes: 0,
+          }
+        } else if (dia === 'Miercoles') {
+          return {
+            ...horarioset,
+            asignatura_miercoles: '',
+            profesor_miercoles: '',
+            id_horario_miercoles: 0,
+          }
+        } else if (dia === 'Jueves') {
+          return {
+            ...horarioset,
+            asignatura_jueves: '',
+            profesor_jueves: '',
+            id_horario_jueves: 0,
+          }
+        } else if (dia === 'Viernes') {
+          
+          return {
+            ...horarioset,
+            asignatura_viernes: '',
+            profesor_viernes: '',
+            id_horario_viernes: 0,
+          }
+        }
+      }
+      return horarioset // Devolvemos el horario sin cambios si no es el que buscamos
+    })
+
+
+    // Actualizamos el estado con el array de horarios actualizados
+    return horariosActualizados
+  }
+  
 
   return (
     <>
@@ -334,6 +469,20 @@ const AppHorarioClasesLunesViernes = () => {
 
       <CModal visible={visible} onClose={handleCloseModal}>
         <CModalHeader>
+        {idHorario != 0 && idHorario!=undefined && idHorario!=null ? (<CRow>
+            <CCol sm={11}></CCol>
+            <CCol sm={1}>
+              <CTooltip content="Eliminar">
+                <button
+                  className="btn btn-danger"
+                  title="Eliminar usuario"
+                  onClick={() => eliminarHorario()}
+                >
+                  <CIcon icon={cilTrash} />
+                </button>
+              </CTooltip>
+            </CCol>
+          </CRow>) : ''}
           <CModalTitle>{data.nombresalon}</CModalTitle>
         </CModalHeader>
         <form onSubmit={handleSubmit}>

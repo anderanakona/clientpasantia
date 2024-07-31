@@ -65,6 +65,20 @@ export const createHorario = async (horario) => {
   }
 }
 
+export const eliminarHorarioBD = async (horario) => {
+  try {
+    const { data } = await axios({
+      url: 'http://localhost:4000/api/horarioClases',
+      method: 'PUT',
+      data: horario,
+    })
+    console.log(data)
+    return data
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
 /**
  * @name obtenerHorarioDetalle
  * @description Petición Get para obtener el listado de planos para cargar

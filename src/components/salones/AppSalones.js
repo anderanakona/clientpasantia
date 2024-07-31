@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { agregarSalon, getAllSalon, getSalon } from '../../api/SalonService'
+import { agregarSalon, eliminarSalon, getAllSalon, getSalon } from '../../api/SalonService'
 import { useDispatch } from 'react-redux'
 // Si tienes estilos específicos para este componente
 import './ImageContainer.css' // Si tienes estilos específicos para este componente
@@ -36,11 +36,13 @@ import {
   cilPencil,
   cilPlus,
   cilSun,
+  cilTrash,
 } from '@coreui/icons'
 import { getHorarioSalon, getHorarioSalonSabado } from '../../api/HorarioClasesService'
 import { typesSalones } from '../../actions/salonAction'
 //para la alerta
 import Swal from 'sweetalert2'
+import Cookies from 'universal-cookie'
 
 const AppSalones = () => {
   const [dataList, setDataList] = useState([])
@@ -50,11 +52,17 @@ const AppSalones = () => {
   const [visible, setVisible] = useState(false)
   const [tipoSalon, setTipoSalon] = useState('Aula')
   const [codigoSalon, setCodigoSalon] = useState('')
+  const [codigoSalonAnt, setCodigoSalonAnt] = useState('')
   const [nombreSalon, setNombreSalon] = useState('')
   const [capacidadSalon, setCapacidadSalon] = useState(25)
+  const [idSalon, setIdSalon] = useState(0)
   const [ubicacion, setUbicacion] = useState('SANJOSE')
   const [tipoCrearModificar, setTipoCrearModificar] = useState('')
   const [readOnlyCodigoSalon, setReadOnlyCodigoSalon] = useState(false)
+
+  const cookies = new Cookies()
+
+
 
   useEffect(() => {
     async function fetchData() {
@@ -64,7 +72,7 @@ const AppSalones = () => {
     fetchData()
   }, []) // Solo se ejecuta cuando 'count' cambia
 
-  const showModal = (tipo, objeto) => {
+  const showModal = async (tipo, objeto) => {
     setVisible(!visible)
     if (tipo === 'crear') {
       setTipoCrearModificar(tipo)
@@ -74,6 +82,8 @@ const AppSalones = () => {
       setCapacidadSalon(25)
       setUbicacion('SANJOSE')
       setReadOnlyCodigoSalon(false)
+      setIdSalon(null)
+      setCodigoSalonAnt('')
     } else {
       setTipoSalon(objeto.tiposalon)
       setCodigoSalon(objeto.codigo_salon)
@@ -81,6 +91,14 @@ const AppSalones = () => {
       setCapacidadSalon(objeto.capacidadsalon)
       setUbicacion(objeto.ubicacion)
       setReadOnlyCodigoSalon(true)
+      setCodigoSalonAnt(objeto.codigo_salon)
+      if (objeto.id) {
+        setIdSalon(objeto.id)
+      } else {
+        const dataSalonQuery = await getSalon(codigoSalon)
+        setIdSalon(dataSalonQuery.data.body[0].id)
+      }
+
     }
   }
 
@@ -114,9 +132,9 @@ const AppSalones = () => {
   const guardar = async (event) => {
     await Swal.fire({
       title:
-      '¿Estás seguro de' + tipoCrearModificar === 'crear'
-        ? 'crear el registro?'
-        : 'guardar cambios?',
+        '¿Estás seguro de' + tipoCrearModificar === 'crear'
+          ? 'crear el registro?'
+          : 'guardar cambios?',
       text: '¡No podrás revertir esto!',
       icon: 'warning',
       showCancelButton: true,
@@ -157,24 +175,37 @@ const AppSalones = () => {
         const datainsert = await agregarSalon(data)
         if (datainsert) {
           Swal.fire({
-            title: 'Cancelado',
+            title: 'Creado',
             text: 'Creado correctamente!',
             icon: 'success',
           })
+          actualizarTabla();
           setDataList([...dataList, data])
           setVisible(!visible)
         }
       }
     } else {
-      const dataSalon = await getSalon(codigoSalon)
+      if (codigoSalonAnt != codigoSalon) {
+        const dataSalonQuery = await getSalon(codigoSalon)
+        if (dataSalonQuery.data.body.length > 0) {
+          Swal.fire({
+            title: 'Upps',
+            text: 'ya existe la asignatura con el codigo ' + codigoSalon,
+            icon: 'error',
+          })
+        }
+      } else {
+
+      }
       const data = {
         codigo_salon: codigoSalon,
         nombresalon: nombreSalon,
         capacidadsalon: capacidadSalon,
-        id: dataSalon.data.body[0].id,
+        id: idSalon,
         ubicacion: ubicacion,
         tiposalon: tipoSalon,
       }
+
       const datainsert = await agregarSalon(data)
 
       if (datainsert) {
@@ -184,8 +215,9 @@ const AppSalones = () => {
           icon: 'success',
         })
         setVisible(!visible)
+        actualizarTabla();
         const nuevaLista = dataList.map((objeto) => {
-          if (objeto.codigo_salon === codigoSalon) {
+          if (objeto.id === idSalon) {
             // Actualizamos el nombre del objeto con el ID correspondiente
             return {
               ...objeto,
@@ -204,6 +236,46 @@ const AppSalones = () => {
       }
     }
     event.preventDefault()
+  }
+
+  // Función para eliminar un usuario
+  const eliminar = async (tipo, salon) => {
+    await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¡No podrás revertir esto!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminarlo!',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const deletesalon = await eliminarSalon(salon)
+        if (deletesalon && deletesalon.status === 200) {
+          actualizarTabla()
+        }
+
+        Swal.fire({
+          title: '¡Eliminado!',
+          text: 'El registro ha sido eliminado.',
+          icon: 'success',
+        })
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: 'Cancelado',
+          text: 'Tu archivo imaginario está seguro :)',
+          icon: 'error',
+        })
+      }
+    })
+  }
+
+  const actualizarTabla = async () => {
+    const datas = await getAllSalon()
+    if (datas) {
+      setDataList(datas.data.body)
+    }
+
   }
 
   // Filtrar las asignaturas basadas en el término de búsqueda
@@ -225,20 +297,25 @@ const AppSalones = () => {
           value={searchTerm}
           onChange={handleSearchChange}
         />
-        <CRow>
-          <CCol sm={11}></CCol>
-          <CCol sm={1}>
-            <CTooltip content="Agregar salon">
-              <CIcon
-                icon={cilPlus}
-                className="text-primary"
-                style={{ cursor: 'pointer' }}
-                size="xl"
-                onClick={() => showModal('crear', null)}
-              />
-            </CTooltip>
-          </CCol>
-        </CRow>
+
+
+        {cookies.get('rol') === 'administrador' || cookies.get('rol') === 'Superadministrador' ? (<>
+          <CRow>
+            <CCol sm={11}></CCol>
+            <CCol sm={1}>
+              <CTooltip content="Agregar salon">
+                <CIcon
+                  icon={cilPlus}
+                  className="text-primary"
+                  style={{ cursor: 'pointer' }}
+                  size="xl"
+                  onClick={() => showModal('crear', null)}
+                />
+              </CTooltip>
+            </CCol>
+          </CRow>
+        </>) : null}
+
         <CTable align="middle" className="mb-0 border" hover responsive>
           <CTableHead color="light">
             <CTableRow>
@@ -248,7 +325,11 @@ const AppSalones = () => {
               <CTableHeaderCell scope="col">Capacidad</CTableHeaderCell>
               <CTableHeaderCell scope="col">Ubicación </CTableHeaderCell>
               <CTableHeaderCell scope="col">Tipo</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Opciones</CTableHeaderCell>
+              {cookies.get('rol') === 'administrador' || cookies.get('rol') === 'Superadministrador' ? (<>
+                <CTableHeaderCell scope="col">Opciones</CTableHeaderCell>
+
+              </>) : null}
+
             </CTableRow>
           </CTableHead>
           <CTableBody>
@@ -262,22 +343,35 @@ const AppSalones = () => {
                 <CTableDataCell>{scheduleItem.capacidadsalon}</CTableDataCell>
                 <CTableDataCell>{scheduleItem.ubicacion}</CTableDataCell>
                 <CTableDataCell>{scheduleItem.tiposalon}</CTableDataCell>
-                <CTableDataCell>
-                  <button
-                    className="btn btn-primary"
-                    title="Agregar Horario"
-                    onClick={() => obtenerDetalleSalones(scheduleItem.codigo_salon)}
-                  >
-                    <CIcon icon={cilPlus} size="lg" />
-                  </button>
-                  <button
-                    className="btn"
-                    title="Actualizar salon"
-                    onClick={() => showModal('actualizar', scheduleItem)}
-                  >
-                    <CIcon icon={cilPencil} />
-                  </button>
-                </CTableDataCell>
+
+
+
+                {cookies.get('rol') === 'administrador' || cookies.get('rol') === 'Superadministrador' ? (<>
+                  <CTableDataCell>
+                    <button
+                      className="btn btn-primary"
+                      title="Agregar Horario"
+                      onClick={() => obtenerDetalleSalones(scheduleItem.codigo_salon)}
+                    >
+                      <CIcon icon={cilPlus} size="lg" />
+                    </button>
+                    <button
+                      className="btn"
+                      title="Actualizar salon"
+                      onClick={() => showModal('actualizar', scheduleItem)}
+                    >
+                      <CIcon icon={cilPencil} />
+                    </button>
+
+                    <button
+                      className="btn btn-danger"
+                      title="Eliminar salon"
+                      onClick={() => eliminar('eliminar', scheduleItem)}
+                    >
+                      <CIcon icon={cilTrash} />
+                    </button>
+                  </CTableDataCell>
+                </>) : null}
               </CTableRow>
             ))}
           </CTableBody>
@@ -326,7 +420,6 @@ const AppSalones = () => {
                   required
                   id="codigo_salon"
                   value={codigoSalon}
-                  disabled={readOnlyCodigoSalon}
                   onChange={(event) => setCodigoSalon(event.target.value)}
                 />
               </CCol>

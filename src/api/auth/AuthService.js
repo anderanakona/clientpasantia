@@ -23,6 +23,8 @@ export const authLogin = async (nombre_usuario, contrasena, props) => {
       cookies.set('email', data.body.data.email, { path: '/' })
       cookies.set('contrasena', data.body.data.contrasena, { path: '/' })
       cookies.set('rol', data.body.data.rol, { path: '/' })
+      cookies.set('id_rol', data.body.data.rol, { path: '/' })
+
     }else{
       alert("error")
     }

@@ -16,3 +16,43 @@ export const getAllAsignatura = async () => {
     return false
   }
 }
+
+export const obtenerAsignaturaCodigo = async (codigo) => {
+  try {
+    const response = await axios({
+      url: 'http://localhost:4000/api/asignatura/'+codigo,
+      method: 'GET',
+    })
+    return response
+  } catch (error) {
+    return false
+  }
+}
+
+
+
+export const agregarAsignatura = async (asignatura) => {
+  try {
+    const { data } = await axios({
+      url: 'http://localhost:4000/api/asignatura/',
+      method: 'POST',
+      data: asignatura,
+    })
+    return data
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+export const eliminarAsignaturaREST = async (asignatura) => {
+  try {
+    const { data } = await axios({
+      url: 'http://localhost:4000/api/asignatura/',
+      method: 'PUT',
+      data: asignatura,
+    })
+    return data
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+

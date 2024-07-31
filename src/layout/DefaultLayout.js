@@ -7,9 +7,9 @@ const DefaultLayout = () => {
   const navigate = useNavigate()
   const cookies = new Cookies()
   useEffect(() => {
-    if (cookies.get('contrasena') == null && cookies.get('nombre_usuario') == null) {
+   /* if (cookies.get('contrasena') == null && cookies.get('nombre_usuario') == null) {
       navigate('/login')
-    }
+    }*/
   })
 
   return (

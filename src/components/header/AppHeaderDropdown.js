@@ -32,6 +32,7 @@ const AppHeaderDropdown = () => {
   const cookies = new Cookies();
   useEffect(() => {});
   const cerrarSesion = () => {
+    cookies.remove("id_rol", { path: "/" });
     cookies.remove("rol", { path: "/" });
     cookies.remove("contrasena", { path: "/" });
     cookies.remove("nombre_usuario", { path: "/" });

@@ -42,10 +42,24 @@ export const agregarSalon = async (salon) => {
       method: 'POST',
       data: salon,
     })
-    console.log(data)
     return data
   } catch (error) {
     console.log(error.message)
   }
 }
+
+export const eliminarSalon = async (salon) => {
+  try {
+    const { data } = await axios({
+      url: 'http://localhost:4000/api/salon/',
+      method: 'PUT',
+      data: salon,
+    })
+    return data
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
+
 

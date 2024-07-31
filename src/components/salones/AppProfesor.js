@@ -31,7 +31,7 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 /* MENU react-contexify */
-import { getAllProfesor } from '../../api/ProfesorService' 
+import { getAllProfesor } from '../../api/ProfesorService'
 
 const AppProfesor = () => {
   const [listProfesores, setListProfesores] = useState([])
@@ -39,7 +39,7 @@ const AppProfesor = () => {
 
   useEffect(() => {
     async function fetchData() {
-      
+
       const dataLista = await getAllProfesor()
       setListProfesores(dataLista.data.body)
     }
@@ -53,6 +53,7 @@ const AppProfesor = () => {
         <CTable align="middle" className="mb-0 border" hover responsive>
           <CTableHead color="light">
             <CTableRow>
+              <CTableHeaderCell scope="col">Codigo</CTableHeaderCell>
               <CTableHeaderCell scope="col">Nombres y apellidos completos </CTableHeaderCell>
               <CTableHeaderCell scope="col">Email</CTableHeaderCell>
               <CTableHeaderCell scope="col">Telefono </CTableHeaderCell>
@@ -60,10 +61,11 @@ const AppProfesor = () => {
           </CTableHead>
           <CTableBody>
             {listProfesores.map((scheduleItem, index) => (
-              <CTableRow key={index}>   
+              <CTableRow key={index}>
+                <CTableDataCell>{scheduleItem.codigo_profesor}</CTableDataCell>
                 <CTableDataCell>{scheduleItem.nombre}</CTableDataCell>
                 <CTableDataCell>{scheduleItem.email}</CTableDataCell>
-                <CTableDataCell>{scheduleItem.telefono}</CTableDataCell>                
+                <CTableDataCell>{scheduleItem.telefono}</CTableDataCell>
               </CTableRow>
             ))}
           </CTableBody>

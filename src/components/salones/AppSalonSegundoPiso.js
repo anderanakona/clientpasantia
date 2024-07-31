@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import ProgressBar from './ProgressBar'
 import exampleImage from '../../assets/images/sanjosesegundopiso.jpg'
 import './ImageContainer.css' // Si tienes estilos específicos para este componente
-import { CAvatar, CBadge,CCardBody, CCard, CCardHeader, CCol, CRow } from '@coreui/react'
+import { CAvatar, CBadge, CCardBody, CCard, CCardHeader, CCol, CRow } from '@coreui/react'
 import { ModalInfoSalones } from '../modals/ModalInfoSalones'
 import { useDispatch } from 'react-redux'
 import { typesModal } from '../../actions/modalesAction'
@@ -56,10 +56,10 @@ const AppSalonSegundoPiso = () => {
       type: typesSalones.INFO_SALON_SABADO,
       horarioSalonDataSabado: dataHorarioSalonSabado.data.body,
     })
-    
+
   }
 
-  const obtenerDiaDeHoy=()=> {
+  const obtenerDiaDeHoy = () => {
     // Crear un nuevo objeto de fecha para hoy
     var today = new Date();
 
@@ -73,222 +73,306 @@ const AppSalonSegundoPiso = () => {
     var dayName = weekdays[dayOfWeek];
 
     return dayOfWeek;
-}
-
-const colocarBotonesVerde=()=>{
-  document.getElementById("SJ202").style.backgroundColor='green';
-  document.getElementById("SJ203").style.backgroundColor='green';
-  document.getElementById("SJ204").style.backgroundColor='green';
-  document.getElementById("SJ205").style.backgroundColor='green';
-
-}
-
-const buscarListaPorSalon = (lista,codSalon) => {
-  return lista.find(salon => salon.codigo_salon === codSalon) !== undefined;
-};
-const btn=async(porcentaje)=>{
-  colocarBotonesVerde();
-  const colores=await obtenerHorarioParaColores(porcentaje,obtenerDiaDeHoy());
- 
-  if(buscarListaPorSalon(colores.data.body,'SJ202')){
-    document.getElementById("SJ202").style.backgroundColor='red';
   }
-  if(buscarListaPorSalon(colores.data.body,'SJ203')){
-    document.getElementById("SJ203").style.backgroundColor='red';
+
+  const colocarBotonesVerde = () => {
+    document.getElementById("SJ202").style.backgroundColor = 'green';
+    document.getElementById("SJ203").style.backgroundColor = 'green';
+    document.getElementById("SJ204").style.backgroundColor = 'green';
+    document.getElementById("SJ205").style.backgroundColor = 'green';
+
   }
-  if(buscarListaPorSalon(colores.data.body,'SJ204')){
-    document.getElementById("SJ204").style.backgroundColor='red';
+
+  const buscarListaPorSalon = (lista, codSalon) => {
+    return lista.find(salon => salon.codigo_salon === codSalon) !== undefined;
+  };
+  const btn = async (porcentaje) => {
+    colocarBotonesVerde();
+    const colores = await obtenerHorarioParaColores(porcentaje, obtenerDiaDeHoy());
+
+    if (buscarListaPorSalon(colores.data.body, 'SJ213')) {
+      document.getElementById("SJ213").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ214')) {
+      document.getElementById("SJ214").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ215')) {
+      document.getElementById("SJ215").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ216')) {
+      document.getElementById("SJ216").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ217')) {
+      document.getElementById("SJ217").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ218')) {
+      document.getElementById("SJ218").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ211')) {
+      document.getElementById("SJ211").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ208')) {
+      document.getElementById("SJ208").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ212')) {
+      document.getElementById("SJ212").style.backgroundColor = 'red';
+    }
+
+    if (buscarListaPorSalon(colores.data.body, 'SJ209')) {
+      document.getElementById("SJ209").style.backgroundColor = 'red';
+    }
+
+    if (buscarListaPorSalon(colores.data.body, 'SJ207')) {
+      document.getElementById("SJ207").style.backgroundColor = 'red';
+    }
+
+    if (buscarListaPorSalon(colores.data.body, 'SJ206')) {
+      document.getElementById("SJ206").style.backgroundColor = 'red';
+    }
+
   }
-  if(buscarListaPorSalon(colores.data.body,'SJ205')){
-    document.getElementById("SJ205").style.backgroundColor='red';
+
+
+
+  //////*******todo de la barra de progreso */
+
+  const handleMouseMove = (event) => {
+    // Puedes realizar cualquier acción que necesites aquí
+    const clickedPositionX = event.clientX - event.target.offsetLeft // Posición del clic respecto al borde izquierdo de la barra
+    //const fullWidth = event.target.offsetWidth; // Ancho total de la barra
+
+    const clickedPercentage = (clickedPositionX / ancho) * 100 // Porcentaje correspondiente al punto donde se hizo clic
+
+    //console.log('Mouse pasó por encima del componente porcentaje ' + clickedPercentage)
   }
-}
 
+  const handleClick = async (event) => {
+    const clickedPositionX = event.clientX - event.target.offsetLeft // Posición del clic respecto al borde izquierdo de la barra
+    //const fullWidth = event.target.offsetWidth; // Ancho total de la barra
 
+    let clickedPercentage = 0 // Porcentaje correspondiente al punto donde se hizo clic
+    if ((clickedPositionX / ancho) * 100 > 100) {
+      clickedPercentage = 100 // Establecer el nuevo progreso
+    } else {
+      clickedPercentage = (clickedPositionX / ancho) * 100 // Establecer el nuevo progreso
+    }
+    //clickedPercentage = (clickedPositionX / ancho) * 100
+    setProgress(clickedPercentage)
+    await btn(clickedPercentage)
 
-//////*******todo de la barra de progreso */
-
-const handleMouseMove = (event) => {
-  // Puedes realizar cualquier acción que necesites aquí
-  const clickedPositionX = event.clientX - event.target.offsetLeft // Posición del clic respecto al borde izquierdo de la barra
-  //const fullWidth = event.target.offsetWidth; // Ancho total de la barra
-
-  const clickedPercentage = (clickedPositionX / ancho) * 100 // Porcentaje correspondiente al punto donde se hizo clic
-
-  //console.log('Mouse pasó por encima del componente porcentaje ' + clickedPercentage)
-}
-
-const handleClick =async (event) => {
-  const clickedPositionX = event.clientX - event.target.offsetLeft // Posición del clic respecto al borde izquierdo de la barra
-  //const fullWidth = event.target.offsetWidth; // Ancho total de la barra
-
-  let clickedPercentage = 0 // Porcentaje correspondiente al punto donde se hizo clic
-  if ((clickedPositionX / ancho) * 100 > 100) {
-    clickedPercentage = 100 // Establecer el nuevo progreso
-  } else {
-    clickedPercentage = (clickedPositionX / ancho) * 100 // Establecer el nuevo progreso
   }
-  //clickedPercentage = (clickedPositionX / ancho) * 100
-  setProgress(clickedPercentage)
-  await btn(clickedPercentage)
 
-}
+  const handleClick2 = async (event) => {
+    const clickedPositionX = event.clientX - event.target.offsetLeft // Posición del clic respecto al borde izquierdo de la barra
+    const fullWidth = event.target.offsetWidth // Ancho total de la barra
 
-const handleClick2 = async(event) => {
-  const clickedPositionX = event.clientX - event.target.offsetLeft // Posición del clic respecto al borde izquierdo de la barra
-  const fullWidth = event.target.offsetWidth // Ancho total de la barra
+    let clickedPercentage = 0 // Porcentaje correspondiente al punto donde se hizo clic
 
-  let clickedPercentage = 0 // Porcentaje correspondiente al punto donde se hizo clic
+    clickedPercentage = (clickedPositionX / fullWidth) * 100
 
-  clickedPercentage = (clickedPositionX / fullWidth) * 100
+    const arreglo = event.target.id.split('|')
 
-  const arreglo = event.target.id.split('|')
+    const hora = await calcularHora(
+      parseInt(arreglo[0], 10),
+      parseInt(arreglo[1], 10),
+      clickedPercentage,
+      arreglo[4],
+    )
 
-  const hora =  await calcularHora(
-    parseInt(arreglo[0], 10),
-    parseInt(arreglo[1], 10),
-    clickedPercentage,
-    arreglo[4],
-  )
+    const partes = hora.split(':')
 
-  const partes =  hora.split(':')
+    const horas = parseInt(partes[0], 10) // Convertir horas a número entero
+    const minutos = parseInt(partes[1], 10) // Convertir minutos a número entero
 
-  const horas =  parseInt(partes[0], 10) // Convertir horas a número entero
-  const minutos =   parseInt(partes[1], 10) // Convertir minutos a número entero
+    const porcentaje = await calcularPorcentajeTiempo(parseInt(7, 10),
+      parseInt(0, 10),
+      parseInt(22, 10),
+      parseInt(10, 10),
+      horas,
+      minutos);
 
-  const porcentaje = await calcularPorcentajeTiempo( parseInt(7, 10),
-  parseInt(0, 10),
-  parseInt(22, 10),
-  parseInt(10, 10),
-  horas,
-  minutos);
+    setProgress(
+      porcentaje
+    )
 
-   setProgress(
-    porcentaje
-  )
+    await btn(porcentaje)
 
-  await btn(porcentaje)
+  }
 
-}
+  const calcularHoraPorcentaje = () => {
+    const horaInicialHoras = 7 // Hora inicial: 7 AM
+    const horaInicialMinutos = 0 // Minutos inicial: 0
 
-const calcularHoraPorcentaje = () => {
-  const horaInicialHoras = 7 // Hora inicial: 7 AM
-  const horaInicialMinutos = 0 // Minutos inicial: 0
+    const horaFinalHoras = 22 // Hora final: 10 PM
+    const horaFinalMinutos = 10 // Minutos final: 10
 
-  const horaFinalHoras = 22 // Hora final: 10 PM
-  const horaFinalMinutos = 10 // Minutos final: 10
+    // Convertir horas a minutos
+    const minutosHoraInicial = horaInicialHoras * 60 + horaInicialMinutos
+    const minutosHoraFinal = horaFinalHoras * 60 + horaFinalMinutos
 
-  // Convertir horas a minutos
-  const minutosHoraInicial = horaInicialHoras * 60 + horaInicialMinutos
-  const minutosHoraFinal = horaFinalHoras * 60 + horaFinalMinutos
+    // Calcular duración total del periodo en minutos
+    const duracionTotalMinutos = minutosHoraFinal - minutosHoraInicial
 
-  // Calcular duración total del periodo en minutos
-  const duracionTotalMinutos = minutosHoraFinal - minutosHoraInicial
+    const minutosPorcentaje = (progress / 100) * duracionTotalMinutos
 
-  const minutosPorcentaje = (progress / 100) * duracionTotalMinutos
+    // Calcular minutos seleccionados desde la hora inicial
+    const minutosSeleccionados = minutosHoraInicial + minutosPorcentaje
 
-  // Calcular minutos seleccionados desde la hora inicial
-  const minutosSeleccionados = minutosHoraInicial + minutosPorcentaje
+    // Calcular horas y minutos resultantes
+    let horasSeleccionadas = Math.floor(minutosSeleccionados / 60)
+    let minutosRestantes = Math.round(minutosSeleccionados % 60)
 
-  // Calcular horas y minutos resultantes
-  let horasSeleccionadas = Math.floor(minutosSeleccionados / 60)
-  let minutosRestantes = Math.round(minutosSeleccionados % 60)
+    // Ajustar horas si es necesario (por ejemplo, si pasa de 24 horas)
+    horasSeleccionadas = horasSeleccionadas % 24
 
-  // Ajustar horas si es necesario (por ejemplo, si pasa de 24 horas)
-  horasSeleccionadas = horasSeleccionadas % 24
+    // Formatear la hora seleccionada en formato HH:mm
+    const horaFormateada = `${horasSeleccionadas.toString()}:${minutosRestantes.toString()}`
+    //setHoraFormato(horaFormateada)
+    return horaFormateada
+  }
 
-  // Formatear la hora seleccionada en formato HH:mm
-  const horaFormateada = `${horasSeleccionadas.toString()}:${minutosRestantes.toString()}`
-  //setHoraFormato(horaFormateada)
-  return horaFormateada
-}
+  const calcularHora = async (horaInicio, minutoInicio, porcentaje, duracionEnMinutos) => {
+    // Crear una nueva promesa que se resuelve inmediatamente
+    return new Promise((resolve) => {
+      // Calcular el porcentaje del tiempo en minutos
+      const minutosPorcentaje = (porcentaje / 100) * duracionEnMinutos;
 
-const calcularHora = async (horaInicio, minutoInicio, porcentaje, duracionEnMinutos) => {
-  // Crear una nueva promesa que se resuelve inmediatamente
-  return new Promise((resolve) => {
-    // Calcular el porcentaje del tiempo en minutos
-    const minutosPorcentaje = (porcentaje / 100) * duracionEnMinutos;
+      // Calcular la hora y los minutos resultantes
+      const minutosTotales = horaInicio * 60 + minutoInicio + minutosPorcentaje;
+      const horasResultantes = Math.floor(minutosTotales / 60);
+      const minutosRestantes = Math.round(minutosTotales % 60);
 
-    // Calcular la hora y los minutos resultantes
-    const minutosTotales = horaInicio * 60 + minutoInicio + minutosPorcentaje;
-    const horasResultantes = Math.floor(minutosTotales / 60);
-    const minutosRestantes = Math.round(minutosTotales % 60);
+      // Formatear la hora resultante en formato HH:mm
+      const horaFormateada = `${horasResultantes.toString().padStart(2, '0')}:${minutosRestantes.toString().padStart(2, '0')}`;
 
-    // Formatear la hora resultante en formato HH:mm
-    const horaFormateada = `${horasResultantes.toString().padStart(2, '0')}:${minutosRestantes.toString().padStart(2, '0')}`;
-
-    // Resolver la promesa con la hora formateada
-    resolve(horaFormateada);
-  });
-};
+      // Resolver la promesa con la hora formateada
+      resolve(horaFormateada);
+    });
+  };
 
 
-const calcularPorcentajeTiempo = async (
-  horaInicio,
-  minutoInicio,
-  horaFin,
-  minutoFin,
-  horaReferencia,
-  minutoReferencia
-) => {
-  // Crear una nueva promesa que se resuelve inmediatamente
-  return new Promise((resolve) => {
-    // Convertir todos los tiempos a minutos
-    const minutosInicio = horaInicio * 60 + minutoInicio;
-    const minutosFin = horaFin * 60 + minutoFin;
-    const minutosReferencia = horaReferencia * 60 + minutoReferencia;
+  const calcularPorcentajeTiempo = async (
+    horaInicio,
+    minutoInicio,
+    horaFin,
+    minutoFin,
+    horaReferencia,
+    minutoReferencia
+  ) => {
+    // Crear una nueva promesa que se resuelve inmediatamente
+    return new Promise((resolve) => {
+      // Convertir todos los tiempos a minutos
+      const minutosInicio = horaInicio * 60 + minutoInicio;
+      const minutosFin = horaFin * 60 + minutoFin;
+      const minutosReferencia = horaReferencia * 60 + minutoReferencia;
 
-    // Calcular la duración total del periodo en minutos
-    const duracionTotal = minutosFin - minutosInicio;
+      // Calcular la duración total del periodo en minutos
+      const duracionTotal = minutosFin - minutosInicio;
 
-    // Calcular el tiempo transcurrido desde la hora de inicio hasta la referencia
-    const tiempoTranscurrido = minutosReferencia - minutosInicio;
+      // Calcular el tiempo transcurrido desde la hora de inicio hasta la referencia
+      const tiempoTranscurrido = minutosReferencia - minutosInicio;
 
-    // Calcular el porcentaje del tiempo transcurrido respecto al total
-    const porcentaje = (tiempoTranscurrido / duracionTotal) * 100;
+      // Calcular el porcentaje del tiempo transcurrido respecto al total
+      const porcentaje = (tiempoTranscurrido / duracionTotal) * 100;
 
-    // Redondear a dos decimales y resolver la promesa
-    resolve(porcentaje.toFixed(2));
-  });
-};
+      // Redondear a dos decimales y resolver la promesa
+      resolve(porcentaje.toFixed(2));
+    });
+  };
 
-/***Termina todo lo de la barra de progreso */
+  /***Termina todo lo de la barra de progreso */
 
   return (
     <>
       <div className="image-container">
         <img src={exampleImage} alt="Descripción de la imagen" className="image" />
+
         <div
           className="etiqueta"
-          title='Salón 202'
-          style={{ top: '28.5%', left: '21.7%',backgroundColor:'green', width: '55px', height: '35px' }}
-          onClick={() => obtenerDetalleSalones('SJ202')}
-          id='SJ202'
-        ></div>
-        
-        <div
-          className="etiqueta"
-          title='Salón 203'
-          style={{ top: '28.5%', left: '30.7%',backgroundColor:'green', width: '45px', height: '35px' }}
-          onClick={() => obtenerDetalleSalones('SJ203')}
-          id='SJ203'
+          style={{ top: '62.5%', left: '48.2%', backgroundColor: 'green', width: '45px', height: '35px' }}
+          onClick={() => obtenerDetalleSalones('SJ213')}
+          id='SJ213'
         ></div>
         <div
           className="etiqueta"
-          title='Salón 204'
-          style={{ top: '28.5%', left: '36.7%',backgroundColor:'green', width: '45px', height: '35px' }}
-          onClick={() => obtenerDetalleSalones('SJ204')}
-          id='SJ204'
+          style={{ top: '67.5%', left: '48.2%', backgroundColor: 'green', width: '45px', height: '35px' }}
+          onClick={() => obtenerDetalleSalones('SJ214')}
+          id='SJ214'
         ></div>
         <div
           className="etiqueta"
-          title='Salón 205'
-          style={{ top: '62.5%', left: '48.2%',backgroundColor:'green', width: '45px', height: '35px' }}
-          onClick={() => obtenerDetalleSalones('SJ205')}
-          id='SJ205'
+          style={{ top: '73.5%', left: '48.2%', backgroundColor: 'green', width: '45px', height: '50px' }}
+          onClick={() => obtenerDetalleSalones('SJ215')}
+          id='SJ215'
         ></div>
-        
-        
+
+        {/***216-218 */}
+
+        <div
+          className="etiqueta"
+          style={{ top: '55.5%', left: '53.7%', backgroundColor: 'green', width: '49px', height: '35px' }}
+          onClick={() => obtenerDetalleSalones('SJ216')}
+          id='SJ216'
+        ></div>
+        <div
+          className="etiqueta"
+          style={{ top: '55.5%', left: '59.1%', backgroundColor: 'green', width: '46px', height: '35px' }}
+          onClick={() => obtenerDetalleSalones('SJ217')}
+          id='SJ217'
+        ></div>
+        <div
+          className="etiqueta"
+          style={{ top: '55.5%', left: '64.4%', backgroundColor: 'green', width: '46px', height: '35px' }}
+          onClick={() => obtenerDetalleSalones('SJ218')}
+          id='SJ218'
+        ></div>
+
+        {/***208 */}
+
+        <div
+          className="etiqueta"
+          style={{ top: '51.5%', left: '20.3%', backgroundColor: 'green', width: '49px', height: '50px' }}
+          onClick={() => obtenerDetalleSalones('SJ208')}
+          id='SJ208'
+        ></div>
+        <div
+          className="etiqueta"
+          style={{ top: '51.9%', left: '27.3%', backgroundColor: 'green', width: '60px', height: '44px' }}
+          onClick={() => obtenerDetalleSalones('SJ211')}
+          id='SJ211'
+        ></div>
+
+        <div
+          className="etiqueta"
+          style={{ top: '51.9%', left: '35.3%', backgroundColor: 'green', width: '60px', height: '44px' }}
+          onClick={() => obtenerDetalleSalones('SJ212')}
+          id='SJ212'
+        ></div>
+
+
+        <div
+          className="etiqueta"
+          style={{ top: '57%', left: '20.3%', backgroundColor: 'green', width: '49px', height: '47px' }}
+          onClick={() => obtenerDetalleSalones('SJ209')}
+          id='SJ209'
+        ></div>
+
+        <div
+          className="etiqueta"
+          style={{ top: '72%', left: '20.3%', backgroundColor: 'green', width: '49px', height: '54px' }}
+          onClick={() => obtenerDetalleSalones('SJ207')}
+          id='SJ207'
+        ></div>
+
+        <div
+          className="etiqueta"
+          style={{ top: '82%', left: '22.3%', backgroundColor: 'green', width: '54px', height: '42px' }}
+          onClick={() => obtenerDetalleSalones('SJ206')}
+          id='SJ206'
+        ></div>
+
+
+
       </div>
       <ModalInfoSalones></ModalInfoSalones>
 

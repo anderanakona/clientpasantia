@@ -22,7 +22,7 @@ import {
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
-const _nav = [
+const _nav2 = [
   {
     component: CNavTitle,
     name: 'Menu',
@@ -47,39 +47,6 @@ const _nav = [
       },    
     ],
   },
-  {
-    component: CNavGroup,
-    name: 'Configuracion',
-    to: '/base',
-    icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,        
-        name: 'Asignaturas',
-        icon: <CIcon icon={cilBook} customClassName="nav-icon" />,
-        to: '/asignaturas',
-      },
-      {
-        component: CNavItem,
-        name: 'Salones',
-        icon: <CIcon icon={cilRoom} customClassName="nav-icon" />,        
-        to: '/salon',
-      },
-      {
-        component: CNavItem,
-        name: 'Profesores',
-        icon: <CIcon icon={cilEducation} customClassName="nav-icon" />,    
-        to: '/profesores',
-      },
-      {
-        component: CNavItem,
-        name: 'Personas',
-        icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,            
-        to: '/personas',
-      },
-      
-    ],
-  },
 ]
 
-export default _nav
+export default _nav2

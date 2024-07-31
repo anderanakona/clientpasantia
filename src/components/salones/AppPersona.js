@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getAllPersonas, createPersona, obtenerPersonaNumTipo } from '../../api/PersonaService'
+import { getAllPersonas, createPersona, obtenerPersonaNumTipo, eliminarPersona } from '../../api/PersonaService'
 import { useDispatch, useSelector } from 'react-redux'
 // Si tienes estilos específicos para este componente
 import './ImageContainer.css' // Si tienes estilos específicos para este componente
@@ -29,10 +29,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 /* MENU react-contexify */
 import 'react-contexify/dist/ReactContexify.css'
-import { cilPencil, cilPlus, cilPuzzle, cilUser } from '@coreui/icons'
+import { cilPencil, cilPlus, cilPuzzle, cilTrash, cilUser } from '@coreui/icons'
 import { typesPersona } from '../../actions/personaAction'
 //para la alerta
 import Swal from 'sweetalert2'
+import Cookies from 'universal-cookie'
 
 const AppPersona = () => {
   const [listPersonas, setListPersonas] = useState([])
@@ -53,6 +54,9 @@ const AppPersona = () => {
   //
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+
+  const cookies = new Cookies()
 
   useEffect(() => {
     async function fetchData() {
@@ -100,9 +104,9 @@ const AppPersona = () => {
   const guardar = async (event) => {
     await Swal.fire({
       title:
-      '¿Estás seguro de' + tipoCrearModificar === 'crear'
-        ? 'crear el registro?'
-        : 'guardar cambios?',
+        '¿Estás seguro de' + tipoCrearModificar === 'crear'
+          ? 'crear el registro?'
+          : 'guardar cambios?',
       text: '¡No podrás revertir esto!',
       icon: 'warning',
       showCancelButton: true,
@@ -142,6 +146,7 @@ const AppPersona = () => {
         }
         const datainsert = await createPersona(data)
         if (datainsert) {
+          actualizarTabla();
           Swal.fire({
             title: 'Creado!',
             text: 'El registro ha sido creado.',
@@ -176,6 +181,7 @@ const AppPersona = () => {
           text: 'El registro ha sido actualizado.',
           icon: 'success',
         })
+        actualizarTabla();
         setVisible(!visible)
         const nuevaLista = listPersonas.map((objeto) => {
           if (objeto.num_id === numId && objeto.cod_tipo_id === tipoId) {
@@ -199,12 +205,52 @@ const AppPersona = () => {
   }
 
   const obtenerPersona = (persona) => {
-    console.log(persona)
     dispatch({
       type: typesPersona.INFO_PERSONA,
       infoPersonaData: persona,
     })
     navigate('/personas/usuario')
+  }
+
+
+  // Función para eliminar un usuario
+  const eliminar = async (tipo, persona) => {
+    await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¡No podrás revertir esto!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminarlo!',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const deleteper = await eliminarPersona(persona)
+        if (deleteper && deleteper.status === 200) {
+          actualizarTabla()
+        }
+
+        Swal.fire({
+          title: '¡Eliminado!',
+          text: 'El registro ha sido eliminado.',
+          icon: 'success',
+        })
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: 'Cancelado',
+          text: 'Tu archivo imaginario está seguro :)',
+          icon: 'error',
+        })
+      }
+    })
+  }
+
+  const actualizarTabla = async () => {
+    const datas = await getAllPersonas()
+    if (datas) {
+      setListPersonas(datas.data.body)
+    }
+
   }
 
   return (
@@ -219,60 +265,84 @@ const AppPersona = () => {
           value={searchTerm}
           onChange={handleSearchChange}
         />
-        <CRow>
-          <CCol sm={11}></CCol>
-          <CCol sm={1}>
-            <CTooltip content="Agregar persona">
-              <CIcon
-                icon={cilPlus}
-                className="text-primary"
-                style={{ cursor: 'pointer' }}
-                size="xl"
-                onClick={() => showModal('crear', null)}
-              />
-            </CTooltip>
-          </CCol>
-        </CRow>
 
-        <CTable align="middle" className="mb-0 border" hover responsive>
-          <CTableHead color="light">
-            <CTableRow>
-              <CTableHeaderCell scope="col">Tipo de identificación</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Numero de identificación</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Nombres</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Apellidos</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Estado</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Accciones</CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {filteredAsignaturas.map((scheduleItem, index) => (
-              <CTableRow key={index}>
-                <CTableDataCell>{scheduleItem.cod_tipo_id}</CTableDataCell>
-                <CTableDataCell>{scheduleItem.num_id}</CTableDataCell>
-                <CTableDataCell>{scheduleItem.nombres}</CTableDataCell>
-                <CTableDataCell>{scheduleItem.apellidos}</CTableDataCell>
-                <CTableDataCell>{scheduleItem.estado}</CTableDataCell>
-                <CTableDataCell>
-                  <button
-                    className="btn btn-primary"
-                    title="Agregar Horario"
-                    onClick={() => showModal('actualizar', scheduleItem)}
-                  >
-                    <CIcon icon={cilPencil} title="Editar" style={{ cursor: 'pointer' }} />
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    title="Agregar Horario"
-                    onClick={() => obtenerPersona(scheduleItem)}
-                  >
-                    <CIcon icon={cilUser} title="Roles" style={{ cursor: 'pointer' }} />
-                  </button>
-                </CTableDataCell>
+        {cookies.get('rol') === 'administrador' || cookies.get('rol') === 'Superadministrador' ? (<>
+          <CRow>
+            <CCol sm={11}></CCol>
+            <CCol sm={1}>
+              <CTooltip content="Agregar persona">
+                <CIcon
+                  icon={cilPlus}
+                  className="text-primary"
+                  style={{ cursor: 'pointer' }}
+                  size="xl"
+                  onClick={() => showModal('crear', null)}
+                />
+              </CTooltip>
+            </CCol>
+          </CRow>
+        </>) : null}
+
+
+
+        {listPersonas.length > 0 ? (
+          <CTable align="middle" className="mb-0 border" hover responsive>
+            <CTableHead color="light">
+              <CTableRow>
+                <CTableHeaderCell scope="col">Tipo de identificación</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Numero de identificación</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Nombres</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Apellidos</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Estado</CTableHeaderCell>
+                {cookies.get('rol') === 'administrador' || cookies.get('rol') === 'Superadministrador' ? (<>
+                  <CTableHeaderCell scope="col">Opciones</CTableHeaderCell>
+
+                </>) : null}
+
               </CTableRow>
-            ))}
-          </CTableBody>
-        </CTable>
+            </CTableHead>
+            <CTableBody>
+              {filteredAsignaturas.map((scheduleItem, index) => (
+                <CTableRow key={index}>
+                  <CTableDataCell>{scheduleItem.cod_tipo_id}</CTableDataCell>
+                  <CTableDataCell>{scheduleItem.num_id}</CTableDataCell>
+                  <CTableDataCell>{scheduleItem.nombres}</CTableDataCell>
+                  <CTableDataCell>{scheduleItem.apellidos}</CTableDataCell>
+                  <CTableDataCell>{scheduleItem.estado}</CTableDataCell>
+                  {cookies.get('rol') === 'administrador' || cookies.get('rol') === 'Superadministrador' ? (<>
+                    <CTableDataCell>
+                      <button
+                        className="btn btn-primary"
+                        title="Agregar Horario"
+                        onClick={() => showModal('actualizar', scheduleItem)}
+                      >
+                        <CIcon icon={cilPencil} title="Editar" style={{ cursor: 'pointer' }} />
+                      </button>
+                      <button
+                        className="btn btn-primary"
+                        title="Agregar Horario"
+                        onClick={() => obtenerPersona(scheduleItem)}
+                      >
+                        <CIcon icon={cilUser} title="Roles" style={{ cursor: 'pointer' }} />
+                      </button>
+
+                      <button
+                        className="btn btn-danger"
+                        title="Eliminar persona"
+                        onClick={() => eliminar('eliminar', scheduleItem)}
+                      >
+                        <CIcon icon={cilTrash} />
+                      </button>
+                    </CTableDataCell>
+                  </>) : null}
+
+
+                </CTableRow>
+              ))}
+            </CTableBody>
+          </CTable>) : ''}
+
+
       </div>
 
       <>

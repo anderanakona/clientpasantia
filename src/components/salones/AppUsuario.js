@@ -35,9 +35,11 @@ import {
   imprimirRol,
   eliminarUsuario,
 } from '../../api/UsuarioService'
+import { agregarProfesor, obtenerProfesorCodigo, obtenerProfesorPersona } from '../../api/ProfesorService'
 import { useNavigate } from 'react-router-dom'
 //para la alerta
 import Swal from 'sweetalert2'
+import Cookies from 'universal-cookie'
 
 const AppUsuario = () => {
   const [listRoles, setListRoles] = useState([])
@@ -55,6 +57,13 @@ const AppUsuario = () => {
   const [tipoCrearModificar, setTipoCrearModificar] = useState('')
   const [readOnly, setReadOnly] = useState(false)
   const [listTodosRoles, setListTodosRoles] = useState([])
+  const [telefonoProfesor, setTelefonoProfesor] = useState('');
+  const [codigoProfesor, setCodigoProfesor] = useState('');
+  const [codigoProfesorAnt, setCodigoProfesorAnt] = useState('');
+  const [idProfesor, setIdProfesor] = useState(0)
+
+  const cookies = new Cookies()
+
 
   useEffect(() => {
     if (per.nombres === undefined) {
@@ -86,6 +95,17 @@ const AppUsuario = () => {
     }
   }, [setDataPersona, dataPersona]) // Solo se ejecuta cuando 'count' cambia
 
+  useEffect(() => {
+    async function fetchData() {
+      if (per.length === 0) {
+        navigate('/persona')
+
+      }
+    }
+    fetchData()
+  }, []) // Solo se ejecuta cuando 'count' cambia
+
+
   const showModalRol = async (tipo, objeto) => {
     setVisible(!visible)
     if (tipo === 'crear') {
@@ -93,12 +113,26 @@ const AppUsuario = () => {
       vaciarFormulario()
       setReadOnly(false)
       setNombreUsuarioAnt('')
+      setCodigoProfesorAnt('')
+      setCodigoProfesor('')
+      setTelefonoProfesor('')
+      setCodigoProfesorAnt('')
+      setCodigoProfesor('')
+      setTelefonoProfesor('')
+      setIdProfesor(0)
     } else {
       setTipoCrearModificar(tipo)
       setNombreUsuario(objeto.nombre_usuario)
       setEmail(objeto.email)
       setRolSelect(objeto.id_rol)
       setReadOnly(true)
+      if (objeto.id_rol === 2) {
+        const dataprofesor = await obtenerProfesorPersona(dataPersona.id)
+        setCodigoProfesorAnt(dataprofesor.data.body[0].codigo_profesor)
+        setCodigoProfesor(dataprofesor.data.body[0].codigo_profesor)
+        setTelefonoProfesor(dataprofesor.data.body[0].telefono)
+        setIdProfesor(dataprofesor.data.body[0].id)
+      }
       setNombreUsuarioAnt(objeto.nombre_usuario)
     }
   }
@@ -154,16 +188,59 @@ const AppUsuario = () => {
           id_rol: rolSelect,
           rol: rolSelect,
         }
-        const datainsert = await agregarUsuario(data)
-        if (datainsert) {
-          Swal.fire({
-            title: '¡Creado!',
-            text: 'El registro ha sido creado.',
-            icon: 'success',
-          })
-          setVisible(!visible)
-          await actualizarTablaRoles()
+
+        ///para mirar si el rol es 2 profesor
+        if (rolSelect == 2) {
+          if (codigoProfesor != codigoProfesorAnt) {
+            const dataPr = await obtenerProfesorCodigo(codigoProfesor);
+            if (dataPr.data.body.length > 0) {
+              Swal.fire({
+                title: 'Upps',
+                text: 'El profesor ya existe con este codigo ' + codigoProfesor,
+                icon: 'error',
+              })
+            } else {
+              const datainsert = await agregarUsuario(data)
+              insertarProfesor();
+              if (datainsert) {
+                Swal.fire({
+                  title: '¡Creado!',
+                  text: 'El registro ha sido creado.',
+                  icon: 'success',
+                })
+                setVisible(!visible)
+                await actualizarTablaRoles()
+              }
+            }
+
+          } else {
+            const datainsert = await agregarUsuario(data)
+            insertarProfesor();
+            if (datainsert) {
+              Swal.fire({
+                title: '¡Creado!',
+                text: 'El registro ha sido creado.',
+                icon: 'success',
+              })
+              setVisible(!visible)
+              await actualizarTablaRoles()
+            }
+          }
+
+        } else {
+          const datainsert = await agregarUsuario(data)
+          if (datainsert) {
+            Swal.fire({
+              title: '¡Creado!',
+              text: 'El registro ha sido creado.',
+              icon: 'success',
+            })
+            setVisible(!visible)
+            await actualizarTablaRoles()
+          }
         }
+
+
       }
     } else {
       const dataNombreUsuario = await buscarusuarioUnico(nombreUsuarioAnt)
@@ -177,7 +254,6 @@ const AppUsuario = () => {
       }
       if (nombreUsuario != nombreUsuarioAnt) {
         const dataNombreUsuario2 = await buscarusuarioUnico(nombreUsuario)
-        console.log(dataNombreUsuario2)
         if (dataNombreUsuario2.data.body) {
           Swal.fire({
             title: 'Upps',
@@ -185,19 +261,61 @@ const AppUsuario = () => {
             icon: 'error',
           })
         } else {
-          const datainsert = await agregarUsuario(data1)
-          if (datainsert) {
-            Swal.fire({
-              title: '¡Creado!',
-              text: 'El registro ha sido creado.',
-              icon: 'success',
-            })
-            setVisible(!visible)
-            await actualizarTablaRoles()
+
+
+          if (rolSelect == 2) {
+            if (codigoProfesor != codigoProfesorAnt) {
+              const dataPr = await obtenerProfesorCodigo(codigoProfesor);
+              if (dataPr.data.body.length > 0) {
+                Swal.fire({
+                  title: 'Upps',
+                  text: 'El profesor ya existe con este codigo ' + codigoProfesor,
+                  icon: 'error',
+                })
+              } else {
+                const datainsert = await agregarUsuario(data1)
+                actualizarProfesor();
+                if (datainsert) {
+                  Swal.fire({
+                    title: 'Actualizado!',
+                    text: 'El registro ha sido actualizado.',
+                    icon: 'success',
+                  })
+                  setVisible(!visible)
+                  await actualizarTablaRoles()
+                }
+              }
+            } else {
+              const datainsert = await agregarUsuario(data1)
+              actualizarProfesor();
+              if (datainsert) {
+                Swal.fire({
+                  title: 'Actualizado!',
+                  text: 'El registro ha sido actualizado.',
+                  icon: 'success',
+                })
+                setVisible(!visible)
+                await actualizarTablaRoles()
+              }
+            }
+          } else {
+            const datainsert = await agregarUsuario(data1)
+            actualizarProfesor();
+            if (datainsert) {
+              Swal.fire({
+                title: 'Actualizado!',
+                text: 'El registro ha sido actualizado.',
+                icon: 'success',
+              })
+              setVisible(!visible)
+              await actualizarTablaRoles()
+            }
           }
+
         }
       } else {
         const datainsert = await agregarUsuario(data1)
+        actualizarProfesor();
         if (datainsert) {
           Swal.fire({
             title: '¡Actualizado!',
@@ -209,6 +327,41 @@ const AppUsuario = () => {
         }
       }
     }
+  }
+
+  const insertarProfesor = async () => {
+
+    const dataInsertProfesor = await agregarProfesor({
+
+      codigo_profesor: codigoProfesor,
+      email: email, telefono: telefonoProfesor, id_persona: dataPersona.id
+    })
+    if (dataInsertProfesor) {
+      Swal.fire({
+        icon: "success",
+        title: "¡Profesor creado correctamente!",
+      });
+    }
+
+
+  }
+
+  const actualizarProfesor = async () => {
+
+    const dataInsertProfesor = await agregarProfesor({
+      id: idProfesor,
+      codigo_profesor: codigoProfesor,
+      email: email, telefono: telefonoProfesor, id_persona: dataPersona.id
+    })
+    console.log(333)
+    if (dataInsertProfesor) {
+      Swal.fire({
+        icon: "success",
+        title: "¡Profesor actualizado correctamente!",
+      });
+    }
+
+
   }
 
   const updateContrasena = async (event) => {
@@ -325,7 +478,7 @@ const AppUsuario = () => {
           </CCol>
           <CCol sm={2}></CCol>
         </CRow>
-        {}
+        { }
         {listRolPersona.length > 0 ? (
           <>
             <CTable align="middle" className="mb-0 border" hover responsive>
@@ -384,7 +537,7 @@ const AppUsuario = () => {
       >
         <CModalHeader>
           <CModalTitle id="ScrollingLongContentExampleLabel">
-            {tipoCrearModificar === 'crear' ? 'Agregar de rol a' : 'Actualizar'}
+            {tipoCrearModificar === 'crear' ? 'Agregar de rol a ' : 'Actualizar '}
             {dataPersona.nombres} {dataPersona.apellidos}
           </CModalTitle>
         </CModalHeader>
@@ -407,11 +560,14 @@ const AppUsuario = () => {
                     onChange={(event) => setRolSelect(event.target.value)}
                   >
                     <option value={''}>Seleccionar rol</option>
-                    {listRoles.map((scheduleItem, index) => (
-                      <option key={index} value={scheduleItem.id}>
-                        {scheduleItem.descripcion}
-                      </option>
-                    ))}
+                    
+                    {listRoles
+                      .filter((role) => role.descripcion.toLowerCase() !== 'Superadministrador')
+                      .map((scheduleItem, index) => (
+                        <option key={index} value={scheduleItem.id}>
+                          {scheduleItem.descripcion}
+                        </option>
+                      ))}
                   </select>
                 ) : (
                   <select
@@ -487,6 +643,45 @@ const AppUsuario = () => {
             ) : (
               ''
             )}
+
+            {rolSelect == 2 ? (<>
+              <CRow className="mb-3">
+                <CCol sm={4}>
+                  <CFormLabel htmlFor="codigoProfesor" className="col-sm-2 col-form-label">
+                    Codigo profesor{' '}
+                  </CFormLabel>
+                </CCol>
+
+                <CCol sm={8}>
+                  <input
+                    type="text"
+                    className="form-control"
+                    required
+                    id="codigoProfesor"
+                    value={codigoProfesor}
+                    onChange={(event) => setCodigoProfesor(event.target.value)}
+                  ></input>
+                </CCol>
+              </CRow>
+              <CRow className="mb-3">
+                <CCol sm={4}>
+                  <CFormLabel htmlFor="telefonoProfesor" className="col-sm-2 col-form-label">
+                    Telefono{' '}
+                  </CFormLabel>
+                </CCol>
+
+                <CCol sm={8}>
+                  <input
+                    type="text"
+                    className="form-control"
+                    required
+                    id="telefonoProfesor"
+                    value={telefonoProfesor}
+                    onChange={(event) => setTelefonoProfesor(event.target.value)}
+                  ></input>
+                </CCol>
+              </CRow></>) : ''}
+
           </CModalBody>
           <CModalFooter>
             <CButton color="secondary" onClick={() => setVisible(false)}>
