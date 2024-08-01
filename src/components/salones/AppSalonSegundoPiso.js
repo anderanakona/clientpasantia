@@ -76,10 +76,10 @@ const AppSalonSegundoPiso = () => {
   }
 
   const colocarBotonesVerde = () => {
-    document.getElementById("SJ202").style.backgroundColor = 'green';
-    document.getElementById("SJ203").style.backgroundColor = 'green';
-    document.getElementById("SJ204").style.backgroundColor = 'green';
-    document.getElementById("SJ205").style.backgroundColor = 'green';
+   // document.getElementById("SJ202").style.backgroundColor = 'green';
+   // document.getElementById("SJ203").style.backgroundColor = 'green';
+   // document.getElementById("SJ204").style.backgroundColor = 'green';
+  //  document.getElementById("SJ205").style.backgroundColor = 'green';
 
   }
 
@@ -92,42 +92,66 @@ const AppSalonSegundoPiso = () => {
 
     if (buscarListaPorSalon(colores.data.body, 'SJ213')) {
       document.getElementById("SJ213").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ213").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ214')) {
       document.getElementById("SJ214").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ214").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ215')) {
       document.getElementById("SJ215").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ215").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ216')) {
       document.getElementById("SJ216").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ216").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ217')) {
       document.getElementById("SJ217").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ217").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ218')) {
       document.getElementById("SJ218").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ218").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ211')) {
       document.getElementById("SJ211").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ211").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ208')) {
       document.getElementById("SJ208").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ208").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ212')) {
       document.getElementById("SJ212").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ212").style.backgroundColor = 'green';
     }
 
     if (buscarListaPorSalon(colores.data.body, 'SJ209')) {
       document.getElementById("SJ209").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ209").style.backgroundColor = 'green';
     }
 
     if (buscarListaPorSalon(colores.data.body, 'SJ207')) {
       document.getElementById("SJ207").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ207").style.backgroundColor = 'green';
     }
 
     if (buscarListaPorSalon(colores.data.body, 'SJ206')) {
       document.getElementById("SJ206").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ206").style.backgroundColor = 'green';
     }
 
   }

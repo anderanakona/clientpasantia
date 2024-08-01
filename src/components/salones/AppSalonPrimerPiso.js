@@ -72,10 +72,10 @@ const AppSalonPrimerPiso = () => {
   }
 
   const colocarBotonesVerde = () => {
-    document.getElementById("SJ113").style.backgroundColor = 'green';
-    document.getElementById("labfinanciero").style.backgroundColor = 'green';
-    document.getElementById("SJ109").style.backgroundColor = 'green';
-    document.getElementById("SJ117").style.backgroundColor = 'green';
+  //  document.getElementById("SJ113").style.backgroundColor = 'green';
+   // document.getElementById("labfinanciero").style.backgroundColor = 'green';
+   // document.getElementById("SJ109").style.backgroundColor = 'green';
+   // document.getElementById("SJ117").style.backgroundColor = 'green';
 
   }
 
@@ -88,39 +88,63 @@ const AppSalonPrimerPiso = () => {
 
     if (buscarListaPorSalon(colores.data.body, 'SJ113')) {
       document.getElementById("SJ113").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ113").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'labfinanciero')) {
       document.getElementById("labfinanciero").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("labfinanciero").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ109')) {
       document.getElementById("SJ109").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ109").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, '108')) {
       document.getElementById("SJ108").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ108").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, '107')) {
       document.getElementById("SJ107").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ107").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, '106')) {
       document.getElementById("SJ106").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ107").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ105')) {
       document.getElementById("SJ105").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ105").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'labarqui')) {
       document.getElementById("labarqui").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("labarqui").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'labsoftware')) {
       document.getElementById("labsoftware").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("labsoftware").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ114')) {
       document.getElementById("SJ114").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ114").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ115')) {
       document.getElementById("SJ115").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ115").style.backgroundColor = 'green';
     }
     if (buscarListaPorSalon(colores.data.body, 'SJ116')) {
       document.getElementById("SJ116").style.backgroundColor = 'red';
+    }else{
+      document.getElementById("SJ116").style.backgroundColor = 'green';
     }
     
     
@@ -301,8 +325,7 @@ const AppSalonPrimerPiso = () => {
           id='SJ109'
         ></div>
         <div
-          color="primary"
-          textColor="white"
+          color="primary"          
           className="etiqueta"
           style={{ top: '65%', left: '11.9%', backgroundColor: 'green', width: '35px', height: '53px' }}
           onClick={() => obtenerDetalleSalones('SJ108')}
@@ -310,8 +333,7 @@ const AppSalonPrimerPiso = () => {
         ></div>
 
         <div
-          color="primary"
-          textColor="white"
+          color="primary"          
           className="etiqueta"
           style={{ top: '71.5%', left: '11.9%', backgroundColor: 'green', width: '35px', height: '43px' }}
           onClick={() => obtenerDetalleSalones('SJ107')}
@@ -320,7 +342,7 @@ const AppSalonPrimerPiso = () => {
 
         <div
           color="primary"
-          textColor="white"
+          
           className="etiqueta"
           style={{ top: '82%', left: '11.9%', backgroundColor: 'green', width: '45px', height: '37px' }}
           onClick={() => obtenerDetalleSalones('SJ106')}
@@ -328,7 +350,7 @@ const AppSalonPrimerPiso = () => {
         ></div>
         <div
           color="primary"
-          textColor="white"
+          
           className="etiqueta"
           style={{ top: '82%', left: '18.5%', backgroundColor: 'green', width: '45px', height: '37px' }}
           onClick={() => obtenerDetalleSalones('SJ105')}
@@ -336,7 +358,7 @@ const AppSalonPrimerPiso = () => {
         ></div>
         <div
           color="primary"
-          textColor="white"
+          
           className="etiqueta"
           style={{ top: '82%', left: '24.3%', backgroundColor: 'green', width: '45px', height: '37px' }}
           onClick={() => obtenerDetalleSalones('labarqui')}
