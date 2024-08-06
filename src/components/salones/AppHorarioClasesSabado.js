@@ -264,7 +264,7 @@ const AppHorarioClasesSabado = () => {
             setListHorario(actualizarHorario(idHora))
             setListHorario(actualizarHorario(idHora))
             Swal.fire({
-              title: 'Cancelado',
+              title: 'Guardado',
               text: 'Tu registro ha sido guardado correctamente :)',
               icon: 'success',
             })
