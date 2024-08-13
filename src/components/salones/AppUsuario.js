@@ -497,7 +497,7 @@ const AppUsuario = () => {
                     <CTableDataCell>{scheduleItem.email}</CTableDataCell>
                     <CTableDataCell>{scheduleItem.descripcion}</CTableDataCell>
                     <CTableDataCell>
-                      <button
+                    <button
                         className="btn btn-primary"
                         title="Actualizar usuario"
                         onClick={() => showModalRol('actualizar', scheduleItem)}
@@ -505,13 +505,16 @@ const AppUsuario = () => {
                         <CIcon icon={cilPencil} />
                       </button>
 
-                      <button
+                      {scheduleItem.descripcion != 'Superadministrador' ? ( <button
                         className="btn btn-danger"
                         title="Eliminar usuario"
                         onClick={() => eliminarRol('eliminar', scheduleItem)}
                       >
                         <CIcon icon={cilTrash} />
-                      </button>
+                      </button>): null}
+
+
+                     
 
                       <button
                         className="btn btn-success"
@@ -562,7 +565,7 @@ const AppUsuario = () => {
                     <option value={''}>Seleccionar rol</option>
                     
                     {listRoles
-                      .filter((role) => role.descripcion.toLowerCase() !== 'Superadministrador')
+                      .filter((role) => role.descripcion != 'Superadministrador')
                       .map((scheduleItem, index) => (
                         <option key={index} value={scheduleItem.id}>
                           {scheduleItem.descripcion}

@@ -6,7 +6,7 @@
   }
   
   .progress {
-    height: 20px;
+    height: 30px;
     background-color: #4caf50; /* Color de la barra de progreso completada */
     transition: width 0.3s ease-in-out;
   }

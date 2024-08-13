@@ -84,6 +84,11 @@ const AppSalonPrimerPiso = () => {
     document.getElementById("labarqui").style.backgroundColor = 'green';
     document.getElementById("labsoftware").style.backgroundColor = 'green';
     document.getElementById("labfinanciero").style.backgroundColor = 'green';
+    document.getElementById("SJ1").style.backgroundColor = 'green';
+    document.getElementById("SJ2").style.backgroundColor = 'green';
+    document.getElementById("SJ3").style.backgroundColor = 'green';
+    document.getElementById("SJ4").style.backgroundColor = 'green';
+    document.getElementById("labredes").style.backgroundColor = 'green';    
 
   }
 
@@ -93,6 +98,19 @@ const AppSalonPrimerPiso = () => {
   const btn = async (porcentaje) => {
     colocarBotonesVerde();
     const colores = await obtenerHorarioParaColores(porcentaje, obtenerDiaDeHoy());
+
+    if (buscarListaPorSalon(colores.data.body, 'SJ1')) {
+      document.getElementById("SJ1").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ2')) {
+      document.getElementById("SJ2").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ4')) {
+      document.getElementById("SJ4").style.backgroundColor = 'red';
+    }
+    if (buscarListaPorSalon(colores.data.body, 'SJ3')) {
+      document.getElementById("SJ3").style.backgroundColor = 'red';
+    }
 
     if (buscarListaPorSalon(colores.data.body, 'SJ113')) {
       document.getElementById("SJ113").style.backgroundColor = 'red';
@@ -133,7 +151,10 @@ const AppSalonPrimerPiso = () => {
     if (buscarListaPorSalon(colores.data.body, 'SJ116')) {
       document.getElementById("SJ116").style.backgroundColor = 'red';
     }
-
+    if (buscarListaPorSalon(colores.data.body, 'labredes')) {
+      document.getElementById("labredes").style.backgroundColor = 'red';
+    }
+    
 
   }
 
@@ -294,6 +315,40 @@ const AppSalonPrimerPiso = () => {
         <div
           className="etiquetapeque"
           style={{
+            top: '25.3%', left: '19.3%', width: '67px', backgroundColor: 'green', height: '35px', borderRadius: '0', // Eliminamos el borde redondeado
+          }}
+          onClick={() => obtenerDetalleSalones('SJ4')}
+          id='SJ4'
+        ></div>
+        <div
+          className="etiquetapeque"
+          style={{
+            top: '34.3%', left: '12.6%', width: '30px', backgroundColor: 'green', height: '50px', borderRadius: '0', // Eliminamos el borde redondeado
+          }}
+          onClick={() => obtenerDetalleSalones('SJ3')}
+          id='SJ3'
+        ></div>
+
+        <div
+          className="etiquetapeque"
+          style={{
+            top: '40.3%', left: '12.6%', width: '30px', backgroundColor: 'green', height: '30px', borderRadius: '0', // Eliminamos el borde redondeado
+          }}
+          onClick={() => obtenerDetalleSalones('SJ2')}
+          id='SJ2'
+        ></div>
+        <div
+          className="etiquetapeque"
+          style={{
+            top: '44.8%', left: '12.3%', width: '30px', backgroundColor: 'green', height: '25px', borderRadius: '0', // Eliminamos el borde redondeado
+          }}
+          onClick={() => obtenerDetalleSalones('SJ1')}
+          id='SJ1'
+        ></div>
+
+        <div
+          className="etiquetapeque"
+          style={{
             top: '50.8%', left: '20.3%', width: '67px', backgroundColor: 'green', height: '35px', borderRadius: '0', // Eliminamos el borde redondeado
           }}
           onClick={() => obtenerDetalleSalones('labfinanciero')}
@@ -387,6 +442,16 @@ const AppSalonPrimerPiso = () => {
           }}
           onClick={() => obtenerDetalleSalones('SJ116')}
           id='SJ116'
+        ></div>
+
+<div
+          className="etiqueta"
+          style={{
+            top: '53.5%', left: '42%', fontSize: '8px',
+            backgroundColor: 'green', width: '46px', height: '35px'
+          }}
+          onClick={() => obtenerDetalleSalones('labredes')}
+          id='labredes'
         ></div>
       </div>
       <ModalInfoSalones></ModalInfoSalones>
